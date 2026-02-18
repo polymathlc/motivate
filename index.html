@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Branching & Remainder Concept — Polymath Learning Centre</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #111;
+  --dark: #222;
+  --mid: #555;
+  --grey: #888;
+  --light: #ccc;
+  --border: #e0e0e0;
+  --bg: #fbfbfb;
+  --card: #fff;
+  --subtle: #f7f7f7;
+  --faint: #fafafa;
+  --accent: #333;
+  --font: 'Century Gothic', 'Avenir Next', 'Avenir', 'Futura', 'Trebuchet MS', sans-serif;
+}
+
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--dark);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════════════════════════════ */
+h1 { font-size: 1.375rem; font-weight: 600; letter-spacing: -0.01em; color: var(--black); }
+h2 { font-size: 1rem; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+h3 { font-size: 0.875rem; font-weight: 600; color: var(--dark); }
+p  { font-size: 0.875rem; line-height: 1.85; color: #444; }
+
+/* ═══════════════════════════════════════════════════════════════
+   LAYOUT
+   ═══════════════════════════════════════════════════════════════ */
+.container { max-width: 800px; margin: 0 auto; padding: 0 32px 60px; }
+
+header {
+  padding: 28px 32px 0;
+  border-bottom: 1px solid #eee;
+  background: var(--card);
+}
+header .inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.header-brand {
+  font-size: 0.625rem;
+  color: #bbb;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.header-right {
+  text-align: right;
+}
+.header-right .label {
+  font-size: 0.625rem;
+  color: var(--light);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.header-right .sub {
+  font-size: 0.6875rem;
+  color: var(--grey);
+  margin-top: 2px;
+}
+
+footer {
+  padding: 16px 32px;
+  border-top: 1px solid #eee;
+  text-align: center;
+  background: var(--card);
+  font-size: 0.625rem;
+  color: var(--light);
+  letter-spacing: 0.1em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FRACTION COMPONENT
+   ═══════════════════════════════════════════════════════════════ */
+.frac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  margin: 0 5px;
+  line-height: 1;
+  font-weight: 500;
+}
+.frac .frac-num,
+.frac .frac-den {
+  font-size: inherit;
+  text-align: center;
+  min-width: 0.9em;
+}
+.frac .frac-line {
+  width: 100%;
+  min-width: 14px;
+  height: 1.5px;
+  background: currentColor;
+  margin: 1px 0;
+  border-radius: 1px;
+}
+.frac.sm { font-size: 0.8125rem; }
+.frac.md { font-size: 1rem; }
+.frac.lg { font-size: 1.25rem; }
+
+/* ═══════════════════════════════════════════════════════════════
+   TAB NAVIGATION
+   ═══════════════════════════════════════════════════════════════ */
+.tab-nav {
+  display: flex;
+  border-bottom: 1px solid #e8e8e8;
+  margin-bottom: 28px;
+  gap: 0;
+  overflow-x: auto;
+}
+.tab-btn {
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--grey);
+  font-size: 0.75rem;
+  font-weight: 400;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: var(--font);
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.tab-btn:hover { color: var(--mid); }
+.tab-btn.active {
+  border-bottom-color: var(--accent);
+  color: var(--dark);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTIONS
+   ═══════════════════════════════════════════════════════════════ */
+.section { margin-bottom: 40px; }
+.section-divider {
+  width: 40px;
+  height: 1.5px;
+  background: var(--accent);
+  margin-bottom: 16px;
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ═══════════════════════════════════════════════════════════════
+   CARDS & BOXES
+   ═══════════════════════════════════════════════════════════════ */
+.card {
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--card);
+}
+.info-box {
+  padding: 16px 20px;
+  background: var(--subtle);
+  border-radius: 5px;
+  border: 1px solid #eee;
+}
+.info-label {
+  font-size: 0.625rem;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 10px;
+}
+.highlight-text {
+  border-bottom: 1.5px solid var(--mid);
+  padding-bottom: 1px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TWO-COLUMN GRID
+   ═══════════════════════════════════════════════════════════════ */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+.method-card .method-label {
+  font-size: 0.6875rem;
+  color: var(--grey);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+.method-card .method-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+.method-card p {
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: #666;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STEP REVEAL
+   ═══════════════════════════════════════════════════════════════ */
+.step-item {
+  padding: 10px 16px;
+  margin-bottom: 6px;
+  border-left: 2.5px solid var(--border);
+  opacity: 0.2;
+  transition: all 0.4s ease;
+  border-radius: 0 4px 4px 0;
+}
+.step-item.revealed {
+  border-left-color: var(--accent);
+  opacity: 1;
+  background: var(--faint);
+}
+.step-item .step-label {
+  font-size: 0.625rem;
+  color: var(--grey);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 3px;
+}
+.step-item .step-content {
+  font-size: 0.875rem;
+  color: var(--accent);
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BUTTONS
+   ═══════════════════════════════════════════════════════════════ */
+.btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  font-family: var(--font);
+  transition: all 0.2s;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #444; }
+.btn-primary:disabled { background: var(--border); color: var(--light); cursor: default; }
+.btn-secondary { background: transparent; color: var(--grey); border: 1px solid #ddd; }
+.btn-secondary:hover { border-color: #bbb; color: var(--mid); }
+.btn-ghost { background: none; border: none; color: var(--grey); font-size: 0.75rem; cursor: pointer; text-decoration: underline; text-decoration-style: dotted; font-family: var(--font); padding: 0; }
+
+/* ═══════════════════════════════════════════════════════════════
+   TIPS LIST
+   ═══════════════════════════════════════════════════════════════ */
+.tips-list { display: flex; flex-direction: column; gap: 8px; }
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #f9f9f9;
+  border-radius: 4px;
+  border-left: 2px solid var(--light);
+}
+.tip-num {
+  font-size: 0.6875rem;
+  color: #aaa;
+  font-weight: 600;
+  min-width: 16px;
+}
+.tip-text {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--mid);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MODEL BUILDER / BRANCHING CALC — CONTROLS
+   ═══════════════════════════════════════════════════════════════ */
+.controls-row {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.control-group label {
+  font-size: 0.6875rem;
+  color: var(--grey);
+  display: block;
+  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.control-group .input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.control-group input[type="number"] {
+  width: 48px;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  font-size: 0.875rem;
+  text-align: center;
+  font-family: var(--font);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.control-group input[type="number"]:focus { border-color: var(--grey); }
+.control-group .slash { color: var(--light); }
+
+/* ═══════════════════════════════════════════════════════════════
+   BAR MODEL
+   ═══════════════════════════════════════════════════════════════ */
+.bar-model {
+  margin: 16px 0;
+}
+.bar-container {
+  display: flex;
+  height: 48px;
+  border: 1.5px solid var(--accent);
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--faint);
+}
+.bar-segment {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6875rem;
+  color: var(--mid);
+  font-weight: 500;
+  position: relative;
+  transition: all 0.4s ease;
+  letter-spacing: 0.02em;
+}
+.bar-segment:not(:last-child) {
+  border-right: 1px solid #bbb;
+}
+.bar-segment .sub-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0.5px;
+  background: var(--light);
+}
+.bar-labels {
+  display: flex;
+  margin-top: 6px;
+}
+.bar-label {
+  text-align: center;
+  font-size: 0.6875rem;
+  color: #666;
+  letter-spacing: 0.03em;
+}
+.model-info {
+  padding: 12px 16px;
+  background: #f8f8f8;
+  border-radius: 4px;
+  margin-top: 12px;
+  font-size: 0.8125rem;
+  color: var(--mid);
+  line-height: 1.7;
+}
+.step-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BRANCHING SVG
+   ═══════════════════════════════════════════════════════════════ */
+.branch-svg {
+  width: 100%;
+  max-width: 620px;
+  height: auto;
+  margin: 16px 0;
+}
+.branch-calc {
+  padding: 14px 18px;
+  background: #f8f8f8;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  color: #444;
+  line-height: 2;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HOW-IT-WORKS STEPS
+   ═══════════════════════════════════════════════════════════════ */
+.how-steps { display: flex; flex-direction: column; gap: 12px; }
+.how-step {
+  display: flex;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--faint);
+  border-radius: 4px;
+}
+.how-step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #666;
+  flex-shrink: 0;
+}
+.how-step-title { font-size: 0.8125rem; font-weight: 600; color: var(--accent); margin-bottom: 2px; }
+.how-step-desc { font-size: 0.75rem; color: var(--grey); line-height: 1.5; }
+
+/* ═══════════════════════════════════════════════════════════════
+   RULES BOX
+   ═══════════════════════════════════════════════════════════════ */
+.rules-box {
+  padding: 18px 22px;
+  background: var(--subtle);
+  border-radius: 5px;
+  border: 1px solid #eee;
+  font-size: 0.8125rem;
+  line-height: 2;
+  color: #444;
+}
+.rules-box .rule { margin-bottom: 8px; }
+.rules-box .rule:last-child { margin-bottom: 0; }
+.rules-box strong { color: var(--dark); }
+
+/* ═══════════════════════════════════════════════════════════════
+   PROGRESS BAR
+   ═══════════════════════════════════════════════════════════════ */
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.progress-track {
+  flex: 1;
+  height: 3px;
+  background: #eee;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--mid);
+  transition: width 0.4s ease;
+  border-radius: 2px;
+}
+.progress-label {
+  font-size: 0.6875rem;
+  color: #aaa;
+  letter-spacing: 0.05em;
+  min-width: 50px;
+  text-align: right;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FILTER BUTTONS
+   ═══════════════════════════════════════════════════════════════ */
+.filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.filter-btns { display: flex; gap: 6px; }
+.filter-btn {
+  padding: 5px 12px;
+  font-size: 0.625rem;
+  font-family: var(--font);
+  background: transparent;
+  color: var(--grey);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: all 0.2s;
+}
+.filter-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   QUIZ QUESTION CARD
+   ═══════════════════════════════════════════════════════════════ */
+.q-card {
+  padding: 24px 28px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 20px;
+  background: var(--card);
+  transition: border-color 0.3s;
+}
+.q-card.correct { border-color: #4a4a4a; }
+.q-card.wrong { border-color: #bbb; }
+
+.q-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.q-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 10px;
+  color: var(--accent);
+}
+.q-difficulty {
+  font-size: 0.625rem;
+  color: var(--grey);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.q-text {
+  font-size: 0.875rem;
+  line-height: 1.8;
+  color: var(--dark);
+  margin-bottom: 16px;
+}
+.q-sub {
+  margin-left: 20px;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  color: var(--accent);
+}
+
+/* Quiz bar model */
+.q-bar { margin: 12px 0 16px; }
+.q-bar .bar-container { height: 38px; }
+
+/* Hint */
+.hint-box {
+  margin-top: 8px;
+  padding: 10px 14px;
+  background: #f8f8f8;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  color: #666;
+  line-height: 1.6;
+  border-left: 2px solid #ddd;
+  display: none;
+}
+.hint-box.visible { display: block; }
+
+/* Input row */
+.q-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+.q-input {
+  flex: 1;
+  max-width: 280px;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: var(--font);
+  outline: none;
+  color: var(--accent);
+  background: var(--card);
+  transition: border-color 0.2s;
+}
+.q-input:focus { border-color: var(--grey); }
+.q-input:disabled { background: #f5f5f5; }
+
+/* Feedback */
+.q-feedback {
+  margin-top: 12px;
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+.q-feedback.visible { display: flex; }
+.q-feedback.correct-fb {
+  background: #f0f0f0;
+  border: 1px solid var(--light);
+  color: var(--accent);
+}
+.q-feedback.wrong-fb {
+  background: var(--faint);
+  border: 1px solid #e8e8e8;
+  color: var(--grey);
+}
+.q-feedback .fb-icon { font-size: 1rem; }
+
+/* Solution */
+.q-solution {
+  margin-top: 12px;
+  padding: 16px 20px;
+  background: var(--faint);
+  border-radius: 4px;
+  border: 1px solid #eee;
+  display: none;
+}
+.q-solution.visible { display: block; }
+.q-solution .sol-label {
+  font-size: 0.625rem;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+}
+.q-solution .sol-line {
+  font-size: 0.8125rem;
+  color: var(--mid);
+  margin-bottom: 4px;
+  line-height: 1.7;
+}
+.q-solution .sol-line.indent { padding-left: 16px; }
+.q-solution .sol-line.highlight { color: var(--black); font-weight: 600; }
+
+/* ═══════════════════════════════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #bbb; }
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.4s ease forwards; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HEADER ═══════════════════════ -->
+<header>
+  <div class="inner">
+    <div class="header-row">
+      <div>
+        <div class="header-brand">POLYMATH LEARNING CENTRE</div>
+        <h1>Branching &amp; Remainder Concept</h1>
+      </div>
+      <div class="header-right">
+        <div class="label">Primary 5 Math</div>
+        <div class="sub">December Worksheet 3</div>
+      </div>
+    </div>
+    <nav class="tab-nav" id="tabNav">
+      <button class="tab-btn active" data-tab="learn">Learn</button>
+      <button class="tab-btn" data-tab="model">Model Method</button>
+      <button class="tab-btn" data-tab="branch">Branching Method</button>
+      <button class="tab-btn" data-tab="practice">Practice</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<main class="container">
+
+<!-- ────────────────── LEARN TAB ────────────────── -->
+<div class="tab-panel active" id="panel-learn">
+
+  <section class="section">
+    <h2>What is a Remainder Question?</h2>
+    <div class="section-divider"></div>
+    <p>A remainder or branching question gives you <strong>a fraction of something</strong>, then asks you to work with <strong>a fraction of the remainder</strong>. The key word is "remaining" — it signals that the second fraction applies to what's left, not the original total.</p>
+
+    <div class="info-box" style="margin-top:16px">
+      <div class="info-label">Examples to Identify</div>
+      <div style="font-size:0.875rem; line-height:2.2; color:#444">
+        <div>a. <span class="frac sm"><span class="frac-num">5</span><span class="frac-line"></span><span class="frac-den">6</span></span> of the students in a hall are adults. <span class="frac sm"><span class="frac-num">2</span><span class="frac-line"></span><span class="frac-den">3</span></span> of the <span class="highlight-text">remaining</span> are boys.</div>
+        <div>b. John spent <span class="frac sm"><span class="frac-num">2</span><span class="frac-line"></span><span class="frac-den">7</span></span> of his money. He gave <span class="frac sm"><span class="frac-num">1</span><span class="frac-line"></span><span class="frac-den">2</span></span> of the <span class="highlight-text">remaining</span> money to his mother.</div>
+        <div>c. <span class="frac sm"><span class="frac-num">1</span><span class="frac-line"></span><span class="frac-den">4</span></span> of some coins are 20-cent coins. <span class="frac sm"><span class="frac-num">2</span><span class="frac-line"></span><span class="frac-den">3</span></span> of the <span class="highlight-text">remaining</span> coins are 50-cent coins.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Two Methods of Solving</h2>
+    <div class="section-divider"></div>
+    <div class="grid-2">
+      <div class="card method-card">
+        <div class="method-label">Method 1</div>
+        <div class="method-title">Model Method</div>
+        <p>Draw a bar model, shade the first fraction, then subdivide the remainder using the LCM of the denominators.</p>
+      </div>
+      <div class="card method-card">
+        <div class="method-label">Method 2</div>
+        <div class="method-title">Branching Method</div>
+        <p>Build a tree diagram. Multiply along branches to convert fractions of the remainder into fractions of the total.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Concept Guide: Worked Example</h2>
+    <div class="section-divider"></div>
+    <div class="info-box" style="margin-bottom:20px; font-size:0.875rem; line-height:1.8; color:#333">
+      Timothy sold 60% of the fun fair tickets on Sunday. He sold <span class="frac sm"><span class="frac-num">3</span><span class="frac-line"></span><span class="frac-den">8</span></span> of the remaining tickets on Monday and the rest of the tickets on Tuesday. What percentage of the funfair tickets did he sell on Tuesday?
+    </div>
+
+    <div id="stepsContainer">
+      <div class="step-item" data-step="0">
+        <div class="step-label">Step 1</div>
+        <div class="step-content">Identify as a remainder question: 60% sold on Sunday, then <span class="frac sm"><span class="frac-num">3</span><span class="frac-line"></span><span class="frac-den">8</span></span> of the <em>remaining</em> sold on Monday.</div>
+      </div>
+      <div class="step-item" data-step="1">
+        <div class="step-label">Step 2</div>
+        <div class="step-content">Convert 60% to a fraction: 60/100 = <span class="frac sm"><span class="frac-num">3</span><span class="frac-line"></span><span class="frac-den">5</span></span>. So Sunday = <span class="frac sm"><span class="frac-num">3</span><span class="frac-line"></span><span class="frac-den">5</span></span>, Remainder = <span class="frac sm"><span class="frac-num">2</span><span class="frac-line"></span><span class="frac-den">5</span></span>.</div>
+      </div>
+      <div class="step-item" data-step="2">
+        <div class="step-label">Step 3</div>
+        <div class="step-content">Monday = <span class="frac sm"><span class="frac-num">3</span><span class="frac-line"></span><span class="frac-den">8</span></span> of the remainder. Tuesday = <span class="frac sm"><span class="frac-num">5</span><span class="frac-line"></span><span class="frac-den">8</span></span> of the remainder.</div>
+      </div>
+      <div class="step-item" data-step="3">
+        <div class="step-label">Step 4</div>
+        <div class="step-content">Tuesday as fraction of total: <span class="frac sm"><span class="frac-num">5</span><span class="frac-line"></span><span class="frac-den">8</span></span> × <span class="frac sm"><span class="frac-num">2</span><span class="frac-line"></span><span class="frac-den">5</span></span> = <span class="frac sm"><span class="frac-num">10</span><span class="frac-line"></span><span class="frac-den">40</span></span> = <span class="frac sm"><span class="frac-num">1</span><span class="frac-line"></span><span class="frac-den">4</span></span></div>
+      </div>
+      <div class="step-item" data-step="4">
+        <div class="step-label">Step 5</div>
+        <div class="step-content"><span class="frac sm"><span class="frac-num">1</span><span class="frac-line"></span><span class="frac-den">4</span></span> × 100% = <strong>25%</strong> — Timothy sold 25% of tickets on Tuesday.</div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:16px">
+      <button class="btn btn-primary" id="btnRevealNext">SHOW NEXT STEP</button>
+      <button class="btn btn-secondary" id="btnResetSteps" style="display:none">RESET</button>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Key Tips</h2>
+    <div class="section-divider"></div>
+    <div class="tips-list">
+      <div class="tip-item"><span class="tip-num">1.</span><span class="tip-text">"Remaining" means the fraction applies to what's LEFT, not the original whole.</span></div>
+      <div class="tip-item"><span class="tip-num">2.</span><span class="tip-text">In branching, the top and bottom branches must add up to 1 whole.</span></div>
+      <div class="tip-item"><span class="tip-num">3.</span><span class="tip-text">To convert a branch fraction to a fraction of the total, multiply along the branch path.</span></div>
+      <div class="tip-item"><span class="tip-num">4.</span><span class="tip-text">For "additional X" questions, work backwards from the final number.</span></div>
+      <div class="tip-item"><span class="tip-num">5.</span><span class="tip-text">Always convert percentages to fractions first for easier unit calculation.</span></div>
+    </div>
+  </section>
+</div>
+
+<!-- ────────────────── MODEL METHOD TAB ────────────────── -->
+<div class="tab-panel" id="panel-model">
+  <section class="section">
+    <h2>Interactive Model Method</h2>
+    <div class="section-divider"></div>
+    <p style="margin-bottom:8px">Adjust the fractions and step through the model method. Watch how the bar gets subdivided to handle the remainder concept.</p>
+  </section>
+
+  <div class="info-label">INTERACTIVE MODEL BUILDER</div>
+
+  <div class="controls-row">
+    <div class="control-group">
+      <label>First Fraction</label>
+      <div class="input-row">
+        <input type="number" id="m_f1n" value="3" min="1" max="20">
+        <span class="slash">/</span>
+        <input type="number" id="m_f1d" value="5" min="2" max="20">
+      </div>
+    </div>
+    <div class="control-group">
+      <label>Second Fraction (of remainder)</label>
+      <div class="input-row">
+        <input type="number" id="m_f2n" value="3" min="1" max="20">
+        <span class="slash">/</span>
+        <input type="number" id="m_f2d" value="8" min="2" max="20">
+      </div>
+    </div>
+  </div>
+
+  <div class="bar-model" id="modelBar"></div>
+  <div class="model-info" id="modelInfo"></div>
+
+  <div class="step-controls">
+    <button class="btn btn-secondary" id="modelPrev" disabled>← PREV</button>
+    <button class="btn btn-primary" id="modelNext">NEXT →</button>
+    <button class="btn btn-secondary" id="modelReset">RESET</button>
+  </div>
+
+  <section class="section" style="margin-top:40px">
+    <h2>How the Model Method Works</h2>
+    <div class="section-divider"></div>
+    <div class="how-steps">
+      <div class="how-step"><div class="how-step-num">1</div><div><div class="how-step-title">Draw the initial bar</div><div class="how-step-desc">Divide the bar into equal units based on the first fraction's denominator.</div></div></div>
+      <div class="how-step"><div class="how-step-num">2</div><div><div class="how-step-title">Shade the first portion</div><div class="how-step-desc">Colour in the units representing the first fraction.</div></div></div>
+      <div class="how-step"><div class="how-step-num">3</div><div><div class="how-step-title">Subdivide the remainder</div><div class="how-step-desc">Find the LCM of the remainder units and the second fraction's denominator. Split each remainder unit accordingly.</div></div></div>
+      <div class="how-step"><div class="how-step-num">4</div><div><div class="how-step-title">Subdivide ALL units equally</div><div class="how-step-desc">When you split remainder units, split the first portion's units the same way to keep them equal.</div></div></div>
+      <div class="how-step"><div class="how-step-num">5</div><div><div class="how-step-title">Shade the second portion</div><div class="how-step-desc">Colour in the appropriate number of sub-units from the remainder.</div></div></div>
+      <div class="how-step"><div class="how-step-num">6</div><div><div class="how-step-title">Read the answer</div><div class="how-step-desc">Count unshaded sub-units over total sub-units. Convert to percentage if needed.</div></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ────────────────── BRANCHING METHOD TAB ────────────────── -->
+<div class="tab-panel" id="panel-branch">
+  <section class="section">
+    <h2>Interactive Branching Method</h2>
+    <div class="section-divider"></div>
+    <p style="margin-bottom:8px">Adjust the fractions to see how the branching diagram updates. The leftover fraction of the total is calculated by multiplying along the branch.</p>
+  </section>
+
+  <div class="info-label">BRANCHING METHOD CALCULATOR</div>
+
+  <div class="controls-row">
+    <div class="control-group">
+      <label>First Fraction</label>
+      <div class="input-row">
+        <input type="number" id="b_f1n" value="3" min="1" max="20">
+        <span class="slash">/</span>
+        <input type="number" id="b_f1d" value="5" min="2" max="20">
+      </div>
+    </div>
+    <div class="control-group">
+      <label>Second Fraction (of remainder)</label>
+      <div class="input-row">
+        <input type="number" id="b_f2n" value="3" min="1" max="20">
+        <span class="slash">/</span>
+        <input type="number" id="b_f2d" value="8" min="2" max="20">
+      </div>
+    </div>
+  </div>
+
+  <div id="branchSvgContainer"></div>
+  <div class="branch-calc" id="branchCalc"></div>
+
+  <section class="section" style="margin-top:40px">
+    <h2>Key Rules for Branching</h2>
+    <div class="section-divider"></div>
+    <div class="rules-box">
+      <div class="rule"><strong>Rule 1:</strong> The top branch + bottom branch must equal 1 whole. The numerators must add up to the denominator.</div>
+      <div class="rule"><strong>Rule 2:</strong> Fractions in the second layer refer to a fraction of the <em>remainder</em>, NOT the total. You cannot directly compare them to the total.</div>
+      <div class="rule"><strong>Rule 3:</strong> To convert a branch fraction to a fraction of the total, <strong>multiply</strong> it by the remainder fraction from the previous branch.</div>
+      <div class="rule"><strong>Rule 4:</strong> For "additional X" type questions, use a pull-down model and work backwards step by step.</div>
+    </div>
+  </section>
+</div>
+
+<!-- ────────────────── PRACTICE TAB ────────────────── -->
+<div class="tab-panel" id="panel-practice">
+  <div class="filter-row">
+    <h2 style="margin:0">Practice Questions</h2>
+    <div class="filter-btns">
+      <button class="filter-btn active" data-filter="ALL">ALL</button>
+      <button class="filter-btn" data-filter="BASIC">BASIC</button>
+      <button class="filter-btn" data-filter="INTERMEDIATE">INTERMEDIATE</button>
+      <button class="filter-btn" data-filter="ADVANCED">ADVANCED</button>
+    </div>
+  </div>
+  <div class="section-divider"></div>
+
+  <div class="progress-row">
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <span class="progress-label" id="progressLabel">0/12</span>
+  </div>
+
+  <div id="questionsContainer"></div>
+</div>
+
+</main>
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<footer>
+  POLYMATH LEARNING CENTRE &nbsp;·&nbsp; PRIMARY 5 MATHEMATICS &nbsp;·&nbsp; BRANCHING &amp; REMAINDER CONCEPT
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════════════════════════ -->
+<script>
+/* ─── Utility: Create fraction HTML ─── */
+function frac(n, d, size) {
+  size = size || 'sm';
+  return '<span class="frac ' + size + '"><span class="frac-num">' + n + '</span><span class="frac-line"></span><span class="frac-den">' + d + '</span></span>';
+}
+
+function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+function lcm(a, b) { return (a * b) / gcd(a, b); }
+
+/* ═══════════════════════════════════════════════════════════════
+   TAB NAVIGATION
+   ═══════════════════════════════════════════════════════════════ */
+document.querySelectorAll('.tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var tab = this.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+    this.classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+    if (tab === 'model') renderModel();
+    if (tab === 'branch') renderBranch();
+    if (tab === 'practice') renderQuestions();
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   STEP REVEAL (Learn tab)
+   ═══════════════════════════════════════════════════════════════ */
+var currentRevealStep = -1;
+var stepItems = document.querySelectorAll('#stepsContainer .step-item');
+
+document.getElementById('btnRevealNext').addEventListener('click', function() {
+  currentRevealStep++;
+  if (currentRevealStep < stepItems.length) {
+    stepItems[currentRevealStep].classList.add('revealed');
+    document.getElementById('btnResetSteps').style.display = '';
+  }
+  if (currentRevealStep >= stepItems.length - 1) {
+    this.disabled = true;
+    this.textContent = 'ALL REVEALED';
+  }
+});
+
+document.getElementById('btnResetSteps').addEventListener('click', function() {
+  currentRevealStep = -1;
+  stepItems.forEach(function(s) { s.classList.remove('revealed'); });
+  var btn = document.getElementById('btnRevealNext');
+  btn.disabled = false;
+  btn.textContent = 'SHOW NEXT STEP';
+  this.style.display = 'none';
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   MODEL METHOD — Interactive
+   ═══════════════════════════════════════════════════════════════ */
+var modelStep = 0;
+
+function getModelVals() {
+  var f1n = Math.max(1, parseInt(document.getElementById('m_f1n').value) || 1);
+  var f1d = Math.max(2, parseInt(document.getElementById('m_f1d').value) || 5);
+  f1n = Math.min(f1n, f1d - 1);
+  var f2n = Math.max(1, parseInt(document.getElementById('m_f2n').value) || 1);
+  var f2d = Math.max(2, parseInt(document.getElementById('m_f2d').value) || 8);
+  f2n = Math.min(f2n, f2d - 1);
+  document.getElementById('m_f1n').value = f1n;
+  document.getElementById('m_f1d').value = f1d;
+  document.getElementById('m_f2n').value = f2n;
+  document.getElementById('m_f2d').value = f2d;
+  return { f1n:f1n, f1d:f1d, f2n:f2n, f2d:f2d };
+}
+
+function renderModel() {
+  var v = getModelVals();
+  var remUnits = v.f1d - v.f1n;
+  var sub = lcm(remUnits, v.f2d) / remUnits;
+  var totalSub = v.f1n * sub + v.f2d;
+  var leftover = v.f2d - v.f2n;
+
+  var barHTML = '<div class="bar-container">';
+  var labelsHTML = '<div class="bar-labels">';
+
+  if (modelStep === 0) {
+    for (var i = 0; i < v.f1d; i++) {
+      var bg = i < v.f1n ? '#d0d0d0' : '#fff';
+      barHTML += '<div class="bar-segment" style="flex:1; background:' + bg + '"></div>';
+    }
+    barHTML += '</div>';
+    labelsHTML += '<div class="bar-label" style="flex:' + v.f1n + '">1st portion (' + v.f1n + '/' + v.f1d + ')</div>';
+    labelsHTML += '<div class="bar-label" style="flex:' + remUnits + '">Remainder (' + remUnits + '/' + v.f1d + ')</div>';
+  } else if (modelStep === 1) {
+    for (var i = 0; i < v.f1n; i++) {
+      barHTML += '<div class="bar-segment" style="flex:' + sub + '; background:#c8c8c8; position:relative">';
+      for (var j = 1; j < sub; j++) {
+        barHTML += '<div class="sub-line" style="left:' + (j / sub * 100) + '%"></div>';
+      }
+      barHTML += '</div>';
+    }
+    for (var i = 0; i < remUnits; i++) {
+      barHTML += '<div class="bar-segment" style="flex:' + sub + '; background:#f5f5f5; position:relative">';
+      for (var j = 1; j < sub; j++) {
+        barHTML += '<div class="sub-line" style="left:' + (j / sub * 100) + '%"></div>';
+      }
+      barHTML += '</div>';
+    }
+    barHTML += '</div>';
+    labelsHTML += '<div class="bar-label" style="flex:' + (v.f1n * sub) + '">1st portion</div>';
+    labelsHTML += '<div class="bar-label" style="flex:' + (remUnits * sub) + '">Remainder → ' + v.f2d + ' sub-units</div>';
+  } else {
+    for (var i = 0; i < v.f1n * sub; i++) {
+      barHTML += '<div class="bar-segment" style="flex:1; background:#c8c8c8"></div>';
+    }
+    for (var i = 0; i < v.f2n; i++) {
+      barHTML += '<div class="bar-segment" style="flex:1; background:#888; color:#fff">' + (i === Math.floor(v.f2n / 2) ? '2nd' : '') + '</div>';
+    }
+    for (var i = 0; i < leftover; i++) {
+      barHTML += '<div class="bar-segment" style="flex:1; background:#f0f0f0"></div>';
+    }
+    barHTML += '</div>';
+    labelsHTML += '<div class="bar-label" style="flex:' + (v.f1n * sub) + '">1st portion (' + (v.f1n * sub) + 'u)</div>';
+    labelsHTML += '<div class="bar-label" style="flex:' + v.f2n + '">2nd (' + v.f2n + 'u)</div>';
+    labelsHTML += '<div class="bar-label" style="flex:' + leftover + '">Left (' + leftover + 'u)</div>';
+  }
+  labelsHTML += '</div>';
+
+  document.getElementById('modelBar').innerHTML = barHTML + labelsHTML;
+
+  var info = '';
+  if (modelStep === 0) {
+    info = 'The bar is divided into <strong>' + v.f1d + '</strong> equal units. The shaded region represents ' + frac(v.f1n, v.f1d) + ' of the total. The remainder is ' + frac(remUnits, v.f1d) + '.';
+  } else if (modelStep === 1) {
+    info = 'The remainder (' + remUnits + ' units) needs to be subdivided. Since ' + frac(v.f2n, v.f2d) + ' of the remainder is the second portion, we split each remainder unit into ' + sub + ' sub-units to get ' + v.f2d + ' sub-units total.';
+  } else {
+    info = 'After subdividing, the total bar has <strong>' + totalSub + '</strong> equal sub-units. The second portion is ' + v.f2n + ' sub-units, and the leftover is ' + leftover + ' sub-units. So the leftover is ' + frac(leftover, totalSub) + ' of the total = <strong>' + (leftover / totalSub * 100).toFixed(1) + '%</strong>.';
+  }
+  document.getElementById('modelInfo').innerHTML = info;
+
+  document.getElementById('modelPrev').disabled = modelStep === 0;
+  document.getElementById('modelNext').disabled = modelStep >= 2;
+}
+
+document.getElementById('modelNext').addEventListener('click', function() { if (modelStep < 2) { modelStep++; renderModel(); } });
+document.getElementById('modelPrev').addEventListener('click', function() { if (modelStep > 0) { modelStep--; renderModel(); } });
+document.getElementById('modelReset').addEventListener('click', function() { modelStep = 0; renderModel(); });
+
+['m_f1n','m_f1d','m_f2n','m_f2d'].forEach(function(id) {
+  document.getElementById(id).addEventListener('change', function() { modelStep = 0; renderModel(); });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   BRANCHING METHOD — Interactive SVG
+   ═══════════════════════════════════════════════════════════════ */
+function getBranchVals() {
+  var f1n = Math.max(1, parseInt(document.getElementById('b_f1n').value) || 1);
+  var f1d = Math.max(2, parseInt(document.getElementById('b_f1d').value) || 5);
+  f1n = Math.min(f1n, f1d - 1);
+  var f2n = Math.max(1, parseInt(document.getElementById('b_f2n').value) || 1);
+  var f2d = Math.max(2, parseInt(document.getElementById('b_f2d').value) || 8);
+  f2n = Math.min(f2n, f2d - 1);
+  document.getElementById('b_f1n').value = f1n;
+  document.getElementById('b_f1d').value = f1d;
+  document.getElementById('b_f2n').value = f2n;
+  document.getElementById('b_f2d').value = f2d;
+  return { f1n:f1n, f1d:f1d, f2n:f2n, f2d:f2d };
+}
+
+function renderBranch() {
+  var v = getBranchVals();
+  var r1n = v.f1d - v.f1n;
+  var r1d = v.f1d;
+  var r2n = v.f2d - v.f2n;
+  var r2d = v.f2d;
+  var leftNum = r2n * r1n;
+  var leftDen = r2d * r1d;
+  var g = gcd(leftNum, leftDen);
+  var sLeftN = leftNum / g;
+  var sLeftD = leftDen / g;
+  var secNum = v.f2n * r1n;
+  var secDen = v.f2d * r1d;
+  var g2 = gcd(secNum, secDen);
+
+  var svg = '<svg viewBox="0 0 620 270" class="branch-svg">';
+  // Total node
+  svg += '<rect x="10" y="105" width="100" height="55" rx="4" fill="#fff" stroke="#ccc" stroke-width="1.2"/>';
+  svg += '<text x="60" y="123" text-anchor="middle" font-size="9" fill="#999" font-family="Century Gothic,sans-serif">Total</text>';
+  svg += '<text x="50" y="142" text-anchor="middle" font-size="15" fill="#333" font-family="Century Gothic,sans-serif">' + v.f1d + '</text>';
+  svg += '<line x1="46" y1="144" x2="74" y2="144" stroke="#333" stroke-width="1"/>';
+  svg += '<text x="60" y="155" text-anchor="middle" font-size="15" fill="#333" font-family="Century Gothic,sans-serif">' + v.f1d + '</text>';
+
+  // Branch lines
+  svg += '<line x1="110" y1="120" x2="185" y2="60" stroke="#aaa" stroke-width="1"/>';
+  svg += '<line x1="110" y1="145" x2="185" y2="185" stroke="#aaa" stroke-width="1"/>';
+
+  // 1st portion
+  svg += '<rect x="185" y="32" width="115" height="55" rx="4" fill="#f5f5f5" stroke="#ccc" stroke-width="1.2"/>';
+  svg += '<text x="242" y="50" text-anchor="middle" font-size="9" fill="#999" font-family="Century Gothic,sans-serif">1st Portion</text>';
+  svg += '<text x="232" y="69" text-anchor="middle" font-size="15" fill="#333" font-family="Century Gothic,sans-serif">' + v.f1n + '</text>';
+  svg += '<line x1="228" y1="71" x2="256" y2="71" stroke="#333" stroke-width="1"/>';
+  svg += '<text x="242" y="82" text-anchor="middle" font-size="15" fill="#333" font-family="Century Gothic,sans-serif">' + v.f1d + '</text>';
+
+  // Remainder
+  svg += '<rect x="185" y="158" width="115" height="55" rx="4" fill="#fff" stroke="#ccc" stroke-width="1.2"/>';
+  svg += '<text x="242" y="176" text-anchor="middle" font-size="9" fill="#999" font-family="Century Gothic,sans-serif">Remainder</text>';
+  svg += '<text x="232" y="195" text-anchor="middle" font-size="15" fill="#333" font-family="Century Gothic,sans-serif">' + r1n + '</text>';
+  svg += '<line x1="228" y1="197" x2="256" y2="197" stroke="#333" stroke-width="1"/>';
+  svg += '<text x="242" y="208" text-anchor="middle" font-size="15" fill="#333" font-family="Century Gothic,sans-serif">' + r1d + '</text>';
+
+  // Branch lines from remainder
+  svg += '<line x1="300" y1="175" x2="375" y2="120" stroke="#aaa" stroke-width="1"/>';
+  svg += '<line x1="300" y1="198" x2="375" y2="238" stroke="#aaa" stroke-width="1"/>';
+
+  // 2nd portion
+  svg += '<rect x="375" y="93" width="110" height="55" rx="4" fill="#f0f0f0" stroke="#ccc" stroke-width="1.2"/>';
+  svg += '<text x="430" y="111" text-anchor="middle" font-size="9" fill="#999" font-family="Century Gothic,sans-serif">2nd Portion</text>';
+  svg += '<text x="420" y="130" text-anchor="middle" font-size="15" fill="#333" font-family="Century Gothic,sans-serif">' + v.f2n + '</text>';
+  svg += '<line x1="416" y1="132" x2="444" y2="132" stroke="#333" stroke-width="1"/>';
+  svg += '<text x="430" y="143" text-anchor="middle" font-size="15" fill="#333" font-family="Century Gothic,sans-serif">' + v.f2d + '</text>';
+
+  // Leftover
+  svg += '<rect x="375" y="210" width="110" height="55" rx="4" fill="#fff" stroke="#333" stroke-width="1.5"/>';
+  svg += '<text x="430" y="228" text-anchor="middle" font-size="9" fill="#666" font-family="Century Gothic,sans-serif">Leftover</text>';
+  svg += '<text x="420" y="247" text-anchor="middle" font-size="15" fill="#333" font-family="Century Gothic,sans-serif">' + r2n + '</text>';
+  svg += '<line x1="416" y1="249" x2="444" y2="249" stroke="#333" stroke-width="1"/>';
+  svg += '<text x="430" y="260" text-anchor="middle" font-size="15" fill="#333" font-family="Century Gothic,sans-serif">' + r2d + '</text>';
+
+  // Multiply arrow
+  svg += '<path d="M485 238 Q520 238 520 200 Q520 178 508 178" stroke="#888" stroke-width="1" fill="none" stroke-dasharray="3,3"/>';
+  svg += '<text x="530" y="212" font-size="9" fill="#888" font-family="Century Gothic,sans-serif">× remainder</text>';
+
+  // Result box
+  svg += '<rect x="502" y="148" width="108" height="48" rx="4" fill="#333" stroke="none"/>';
+  svg += '<text x="556" y="165" text-anchor="middle" font-size="9" fill="#bbb" font-family="Century Gothic,sans-serif">of total</text>';
+  svg += '<text x="546" y="182" text-anchor="middle" font-size="16" fill="#fff" font-family="Century Gothic,sans-serif">' + sLeftN + '</text>';
+  svg += '<line x1="542" y1="184" x2="570" y2="184" stroke="#fff" stroke-width="1"/>';
+  svg += '<text x="556" y="195" text-anchor="middle" font-size="16" fill="#fff" font-family="Century Gothic,sans-serif">' + sLeftD + '</text>';
+
+  svg += '</svg>';
+
+  document.getElementById('branchSvgContainer').innerHTML = svg;
+
+  var pct = (leftNum / leftDen * 100).toFixed(1);
+  var calcHTML = '<div>Leftover as fraction of remainder: ' + frac(r2n, r2d) + '</div>';
+  calcHTML += '<div style="display:flex; align-items:center; flex-wrap:wrap">Leftover as fraction of total: ' + frac(r2n, r2d) + ' <span style="margin:0 4px">×</span> ' + frac(r1n, r1d) + ' <span style="margin:0 4px">=</span> ' + frac(sLeftN, sLeftD) + ' <span style="margin:0 4px">=</span> <strong>' + pct + '%</strong></div>';
+  document.getElementById('branchCalc').innerHTML = calcHTML;
+}
+
+['b_f1n','b_f1d','b_f2n','b_f2d'].forEach(function(id) {
+  document.getElementById(id).addEventListener('change', renderBranch);
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   PRACTICE — Question Data
+   ═══════════════════════════════════════════════════════════════ */
+var questionsData = [
+  {
+    id: 1, difficulty: 'BASIC',
+    text: 'Mrs Lee sold 320 cookies on Saturday. ' + frac(2,5) + ' of them were chocolate cookies, ' + frac(3,4) + ' of the remainder were durian cookies and the rest were strawberry cookies.',
+    subs: ['(a) How many durian cookies were sold on Saturday?', '(b) What percentage of all the cookies sold were Strawberry cookies?'],
+    answers: ['144'],
+    hint: 'First find the remainder after removing chocolate cookies (3/5 of 320). Then find 3/4 of that remainder for durian cookies.',
+    barSegments: [{w:40, color:'#d5d5d5', label:'Choc'}, {w:60, color:'#f0f0f0', label:'Remainder'}],
+    barLabels: [{text:'Chocolate (2/5)', flex:2}, {text:'Remainder (3/5)', flex:3}],
+    working: [
+      {text:'5u = 320'}, {text:'1u = 320 ÷ 5 = 64', indent:true}, {text:'3u = 64 × 3 = 192 (Remainder)', indent:true},
+      {text:'4p = 192'}, {text:'1p = 192 ÷ 4 = 48', indent:true}, {text:'3p = 48 × 3 = 144', indent:true},
+      {text:'Ans (a): 144 durian cookies', highlight:true},
+      {text:'48/320 = 3/20 × 5/5 = 15/100 = 15%'}, {text:'Ans (b): 15%', highlight:true}
+    ]
+  },
+  {
+    id: 2, difficulty: 'INTERMEDIATE',
+    text: 'Shaun spent ' + frac(1,6) + ' of his money on a pair of shoes and ' + frac(1,2) + ' of the remainder on 2 earphones. After that, his mother gave him $1292. Now Shaun has twice of his original amount of money.',
+    subs: ['(a) How much money did he have at first?', '(b) Both headphones were sold at the same price. How much money did he spend on each headphone?'],
+    answers: ['816'],
+    hint: 'Original → 12u. Shoes → 2u. Earphones → 5u. Left → 5u. Twice original = 24u. $1292 covers the gap.',
+    working: [
+      {text:'original → 12u'}, {text:'shoes → 2u, 2 earphones → 5u, left → 5u'},
+      {text:'(a) 12u × 2 = 24u'}, {text:'24u − 5u = 19u ($1292)', indent:true},
+      {text:'$1292 ÷ 19 = $68 (1u)', indent:true}, {text:'$68 × 12 = $816', indent:true},
+      {text:'Ans (a): $816', highlight:true},
+      {text:'(b) $68 × 5 = $340'}, {text:'$340 ÷ 2 = $170', indent:true},
+      {text:'Ans (b): $170', highlight:true}
+    ]
+  },
+  {
+    id: 3, difficulty: 'INTERMEDIATE',
+    text: 'Edgar spent ' + frac(1,4) + ' of his money on a watch. He spent ' + frac(2,5) + ' of the remainder on 4 shirts and saved the rest. If the watch costs $168 more than one shirt, how much did Edgar save given that the price of each shirt was the same?',
+    subs: [], answers: ['432'],
+    hint: 'Watch → 10u, 4 shirts → 12u. 1 shirt = 3u. Watch − 1 shirt = 10u − 3u = 7u = $168.',
+    working: [
+      {text:'Total → 20u (using LCM)'}, {text:'Watch = 5u → 10u, Remainder = 15u'},
+      {text:'4 shirts = 6u → 12u, Saved = 9u → 18u'}, {text:'12u ÷ 4 = 3u (1 T-shirt)'},
+      {text:'10u − 3u = 7u ($168)'}, {text:'$168 ÷ 7 = $24 (1u)', indent:true},
+      {text:'$24 × 18 = $432', indent:true}, {text:'Ans: $432', highlight:true}
+    ]
+  },
+  {
+    id: 4, difficulty: 'ADVANCED',
+    text: 'During the P6 Post-Exam Activities, ' + frac(2,7) + ' of the pupils and an additional 12 pupils attended the guitar lessons. ' + frac(1,4) + ' of the remaining pupils and an additional 23 pupils attended the photography lessons. The rest of the pupils which were 193 pupils attended the hip-hop lessons. How many P6 pupils were there?',
+    subs: [], answers: ['420'],
+    hint: 'Work backwards from 193 hip-hop students. Add back 23, find the unit, scale up, then add back 12 and scale up again.',
+    working: [
+      {text:'Working backwards:'}, {text:'193 + 23 = 216 (3u)', indent:true},
+      {text:'216 ÷ 3 = 72', indent:true}, {text:'72 × 4 = 288', indent:true},
+      {text:'288 + 12 = 300 (5p)', indent:true}, {text:'300 ÷ 5 = 60', indent:true},
+      {text:'60 × 7 = 420', indent:true}, {text:'Ans: 420', highlight:true}
+    ]
+  },
+  {
+    id: 5, difficulty: 'BASIC',
+    text: 'Diana had a sum of money. After spending ' + frac(2,5) + ' of the money on a cake and ' + frac(5,6) + ' of the remainder on a present, she had $8 left. How much money did Diana have at first?',
+    subs: [], answers: ['80'],
+    hint: '$8 represents 1/10 of the total. Left = 1/6 of 3/5 = 3/30 = 1/10.',
+    working: [
+      {text:'Cake = 2/5, Remainder = 3/5'}, {text:'Present = 5/6 of remainder'},
+      {text:'Left = 1/6 of remainder = 1/6 × 3/5 = 1/10 of total'},
+      {text:'$8 = 1/10 of total'}, {text:'$8 × 10 = $80', indent:true},
+      {text:'Ans: $80', highlight:true}
+    ]
+  },
+  {
+    id: 6, difficulty: 'ADVANCED',
+    text: 'A bag contains a number of 20-cent coins, 50-cent coins and $1 coins. ' + frac(1,4) + ' of the coins are 20-cent coins. ' + frac(2,5) + ' of the remainder are 50-cent coins and the rest are $1 coins. The total value of the coins is $156. How many coins are there altogether?',
+    subs: [], answers: ['360'],
+    hint: 'Find the ratio of coins (20¢:50¢:$1 = 5:6:9), then find value per group.',
+    working: [
+      {text:'20¢ : 50¢ : $1 = 5 : 6 : 9'},
+      {text:'20¢ × 5 = $1', indent:true}, {text:'50¢ × 6 = $3', indent:true}, {text:'$1 × 9 = $9', indent:true},
+      {text:'Total value per group = $13'}, {text:'$156 ÷ $13 = 12 groups'},
+      {text:'Coins per group = 20'}, {text:'20 × 18 = 360'},
+      {text:'Ans: 360', highlight:true}
+    ]
+  },
+  {
+    id: 7, difficulty: 'ADVANCED',
+    text: 'Noah spent ' + frac(1,3) + ' of his money and an additional $200 on a camera. Then he spent ' + frac(3,4) + ' of his remaining money and an additional $75 on a watch. Then he spent ' + frac(2,5) + ' of his remaining money and an additional $24 on a bag. If Noah had $273 left, how much more money did he spend on the watch than on the camera?',
+    subs: [], answers: ['345'],
+    hint: 'Use pull-down model and work backwards from $273.',
+    working: [
+      {text:'Pull-down model → bottom-up (working backwards)'},
+      {text:'$273 + $24 = $297 (3u)', indent:true}, {text:'$297 ÷ 3 × 5 = $495', indent:true},
+      {text:'$495 + $75 = $570 (1p)', indent:true}, {text:'$570 × 3 + $75 = $1785 (Watch)', indent:true},
+      {text:'$570 × 4 = $2280', indent:true}, {text:'$2280 + $200 = $2480', indent:true},
+      {text:'$2480 ÷ 2 = $1240', indent:true}, {text:'$1240 + $200 = $1440 (Camera)', indent:true},
+      {text:'$1785 − $1440 = $345', indent:true}, {text:'Ans: $345', highlight:true}
+    ]
+  },
+  {
+    id: 8, difficulty: 'BASIC',
+    text: 'A man bought some eggs. While he was walking home, he broke ' + frac(1,6) + ' of them and threw them away. He gave 18 of the remaining eggs to his neighbours and was left with ' + frac(1,2) + ' of the eggs that he bought. How many eggs did he buy?',
+    subs: [], answers: ['54'],
+    hint: 'The 18 eggs given away together with the leftover make up the remainder after breaking 1/6.',
+    working: [
+      {text:'18 ÷ 2 = 9 (1 unit)'}, {text:'9 × 6 = 54', indent:true},
+      {text:'Ans: 54', highlight:true}
+    ]
+  },
+  {
+    id: 9, difficulty: 'INTERMEDIATE',
+    text: 'Muthu sold 147 marbles on Monday. He sold ' + frac(3,7) + ' of the remainder on Tuesday and had half of his marbles left. Find the number of marbles he sold altogether?',
+    subs: [], answers: ['588'],
+    hint: 'Half of total left = 4u. Total = 8u. Monday sales = 1u = 147.',
+    working: [
+      {text:'1/2 of total = 4u'}, {text:'Total = 8u'}, {text:'1u = 147'},
+      {text:'4u = 147 × 4 = 588 (sold altogether)', indent:true},
+      {text:'Ans: 588', highlight:true}
+    ]
+  },
+  {
+    id: 10, difficulty: 'ADVANCED',
+    text: 'Ben bought some large-sized, medium-sized and small-sized T-shirts to be sold in his shop. ' + frac(2,5) + ' of the T-shirts he bought were large-sized T-shirts. ' + frac(3,5) + ' of the remaining T-shirts were medium-sized and the rest were small-sized T-shirts. Each small-sized T-shirt costs $8, each medium-sized T-shirt costs $10 and each large-sized T-shirt costs $18. Ben paid $672 more for the medium-sized T-shirts than the small-sized T-shirts. How much did he pay for the large-sized T-shirts?',
+    subs: [], answers: ['2880'],
+    hint: 'L:M:S = 10:9:6. Find value per group and use the $672 difference.',
+    working: [
+      {text:'L : M : S = 10 : 9 : 6'},
+      {text:'$18 × 10 = $180 (L)', indent:true}, {text:'$10 × 9 = $90 (M)', indent:true}, {text:'$8 × 6 = $48 (S)', indent:true},
+      {text:'$90 − $48 = $42 (Diff in 1 group)'}, {text:'$672 ÷ $42 = 16 (groups)'},
+      {text:'$180 × 16 = $2880'}, {text:'Ans: $2880', highlight:true}
+    ]
+  },
+  {
+    id: 11, difficulty: 'ADVANCED',
+    text: 'A bus broke down and the passengers in the bus had to get onto other buses to continue with their journeys. ' + frac(1,4) + ' of the passengers tried to board the first bus that came but 4 of them did not mange to do so. When the second bus came, ' + frac(1,2) + ' of the remaining passengers tried to board it but 6 of them did not manage to do so. When the third bus came, ' + frac(3,4) + ' of the passengers left waiting there managed to board it. There were still 8 passengers left waiting for the next bus to take them. How many passengers were there in the bus that broke down?',
+    subs: [], answers: ['64'],
+    hint: 'Work backwards: 8 left → before 3rd bus → before 2nd bus → before 1st bus.',
+    working: [
+      {text:'Working backwards:'},
+      {text:'8 × 4 = 32 (before 3rd bus)', indent:true}, {text:'32 − 6 = 26 (1/2)', indent:true},
+      {text:'26 × 2 = 52 (before 2nd bus)', indent:true}, {text:'52 − 4 = 48', indent:true},
+      {text:'48 ÷ 3 × 4 = 64', indent:true}, {text:'Ans: 64', highlight:true}
+    ]
+  },
+  {
+    id: 12, difficulty: 'ADVANCED',
+    text: 'In a university, ' + frac(3,5) + ' of the students and an additional 24 students attended art lessons. ' + frac(1,3) + ' of the remaining students and an additional 34 students went for music lessons. The rest of the pupils in the school attended cooking lessons. If a total of 314 students attended cooking lessons, how many students are there in the university?',
+    subs: [], answers: ['1365'],
+    hint: 'Work backwards from cooking (314) → music → art to find total.',
+    working: [
+      {text:'Working backwards:'},
+      {text:'314 + 34 = 348 (2u)', indent:true}, {text:'348 ÷ 2 × 3 = 522', indent:true},
+      {text:'522 + 24 = 546 (2p)', indent:true}, {text:'546 ÷ 2 × 5 = 1365', indent:true},
+      {text:'Ans: 1365', highlight:true}
+    ]
+  }
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   PRACTICE — Render Questions
+   ═══════════════════════════════════════════════════════════════ */
+var correctAnswers = {};
+var currentFilter = 'ALL';
+
+function renderQuestions() {
+  var container = document.getElementById('questionsContainer');
+  var html = '';
+
+  questionsData.forEach(function(q) {
+    if (currentFilter !== 'ALL' && q.difficulty !== currentFilter) return;
+
+    var cardClass = correctAnswers[q.id] === true ? 'correct' : (correctAnswers[q.id] === false ? 'wrong' : '');
+
+    html += '<div class="q-card ' + cardClass + '" id="qcard-' + q.id + '">';
+    html += '<div class="q-header"><div class="q-num">' + q.id + '</div><div class="q-difficulty">' + q.difficulty + '</div></div>';
+    html += '<div class="q-text">' + q.text + '</div>';
+
+    if (q.subs && q.subs.length) {
+      q.subs.forEach(function(s) { html += '<div class="q-sub">' + s + '</div>'; });
+    }
+
+    // Bar model
+    if (q.barSegments) {
+      html += '<div class="q-bar"><div class="bar-container" style="height:38px">';
+      q.barSegments.forEach(function(seg, i) {
+        html += '<div class="bar-segment" style="flex:' + seg.w + '; background:' + seg.color + '">' + (seg.label || '') + '</div>';
+      });
+      html += '</div>';
+      if (q.barLabels) {
+        html += '<div class="bar-labels">';
+        q.barLabels.forEach(function(l) { html += '<div class="bar-label" style="flex:' + l.flex + '">' + l.text + '</div>'; });
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+
+    // Hint
+    html += '<div style="margin-bottom:12px"><button class="btn-ghost" onclick="toggleHint(' + q.id + ')">Show hint</button>';
+    html += '<div class="hint-box" id="hint-' + q.id + '">' + q.hint + '</div></div>';
+
+    // Input
+    html += '<div class="q-input-row">';
+    html += '<input class="q-input" id="input-' + q.id + '" placeholder="Your answer..." onkeydown="if(event.key===\'Enter\')checkAnswer(' + q.id + ')">';
+    html += '<button class="btn btn-primary" id="checkBtn-' + q.id + '" onclick="checkAnswer(' + q.id + ')">CHECK</button>';
+    html += '<button class="btn btn-secondary" id="retryBtn-' + q.id + '" onclick="retryAnswer(' + q.id + ')" style="display:none">RETRY</button>';
+    html += '</div>';
+
+    // Feedback
+    html += '<div class="q-feedback" id="fb-' + q.id + '"><span class="fb-icon"></span><span class="fb-text"></span></div>';
+
+    // Show solution button + solution
+    html += '<div id="solBtnWrap-' + q.id + '" style="margin-top:10px; display:none"><button class="btn-ghost" onclick="toggleSolution(' + q.id + ')">View solution</button></div>';
+    html += '<div class="q-solution" id="sol-' + q.id + '"><div class="sol-label">SOLUTION</div>';
+    q.working.forEach(function(w) {
+      var cls = 'sol-line';
+      if (w.indent) cls += ' indent';
+      if (w.highlight) cls += ' highlight';
+      html += '<div class="' + cls + '">' + w.text + '</div>';
+    });
+    html += '</div>';
+
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+  updateProgress();
+}
+
+function checkAnswer(id) {
+  var q = questionsData.find(function(x) { return x.id === id; });
+  var input = document.getElementById('input-' + id);
+  var val = input.value.replace(/[,$%\s]/g, '').toLowerCase();
+  if (!val) return;
+
+  var correct = q.answers.some(function(ans) {
+    return val === String(ans).replace(/[,$%\s]/g, '').toLowerCase();
+  });
+
+  var fb = document.getElementById('fb-' + id);
+  fb.classList.add('visible');
+  fb.classList.remove('correct-fb', 'wrong-fb');
+
+  var card = document.getElementById('qcard-' + id);
+  card.classList.remove('correct', 'wrong');
+
+  if (correct) {
+    fb.classList.add('correct-fb');
+    fb.querySelector('.fb-icon').textContent = '✓';
+    fb.querySelector('.fb-text').textContent = 'Correct!';
+    card.classList.add('correct');
+    input.disabled = true;
+    correctAnswers[id] = true;
+    document.getElementById('checkBtn-' + id).style.display = 'none';
+    document.getElementById('retryBtn-' + id).style.display = '';
+  } else {
+    fb.classList.add('wrong-fb');
+    fb.querySelector('.fb-icon').textContent = '✗';
+    fb.querySelector('.fb-text').textContent = 'Not quite. Try again or view the working.';
+    card.classList.add('wrong');
+    correctAnswers[id] = false;
+    document.getElementById('solBtnWrap-' + id).style.display = '';
+    document.getElementById('checkBtn-' + id).style.display = 'none';
+    document.getElementById('retryBtn-' + id).style.display = '';
+  }
+  updateProgress();
+}
+
+function retryAnswer(id) {
+  var input = document.getElementById('input-' + id);
+  input.value = '';
+  input.disabled = false;
+  document.getElementById('fb-' + id).classList.remove('visible');
+  document.getElementById('qcard-' + id).classList.remove('correct', 'wrong');
+  document.getElementById('checkBtn-' + id).style.display = '';
+  document.getElementById('retryBtn-' + id).style.display = 'none';
+  document.getElementById('sol-' + id).classList.remove('visible');
+  document.getElementById('solBtnWrap-' + id).style.display = 'none';
+  if (correctAnswers[id] !== true) delete correctAnswers[id];
+  input.focus();
+}
+
+function toggleHint(id) {
+  var h = document.getElementById('hint-' + id);
+  h.classList.toggle('visible');
+  var btn = h.previousElementSibling;
+  btn.textContent = h.classList.contains('visible') ? 'Hide hint' : 'Show hint';
+}
+
+function toggleSolution(id) {
+  var s = document.getElementById('sol-' + id);
+  s.classList.toggle('visible');
+  var btn = document.querySelector('#solBtnWrap-' + id + ' button');
+  btn.textContent = s.classList.contains('visible') ? 'Hide solution' : 'View solution';
+}
+
+function updateProgress() {
+  var total = questionsData.length;
+  var done = Object.keys(correctAnswers).filter(function(k) { return correctAnswers[k] === true; }).length;
+  document.getElementById('progressFill').style.width = (done / total * 100) + '%';
+  document.getElementById('progressLabel').textContent = done + '/' + total;
+}
+
+/* Filter buttons */
+document.querySelectorAll('.filter-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    this.classList.add('active');
+    currentFilter = this.dataset.filter;
+    renderQuestions();
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   INITIAL RENDER
+   ═══════════════════════════════════════════════════════════════ */
+renderModel();
+renderBranch();
+renderQuestions();
+</script>
+</body>
+</html>
