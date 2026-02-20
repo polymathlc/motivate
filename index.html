@@ -1158,6 +1158,240 @@
     }
 
     /* ============================================================
+       TASKS + RPG
+       ============================================================ */
+    .task-section,
+    .rpg-section,
+    .minigame-section {
+      margin-bottom: 28px;
+    }
+
+    .task-create-card,
+    .todo-list,
+    .rpg-card,
+    .battle-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+    }
+
+    .task-create-row {
+      display: grid;
+      grid-template-columns: 1fr 120px 110px;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .task-input,
+    .task-select {
+      width: 100%;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      padding: 10px 12px;
+    }
+
+    .task-input:focus,
+    .task-select:focus {
+      outline: none;
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px var(--cyan-glow);
+    }
+
+    .quest-btn {
+      border: 1px solid var(--border-bright);
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #1a3a70, #0d1f45);
+      color: var(--text-primary);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .quest-btn:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 16px var(--cyan-glow);
+    }
+
+    .quest-btn.warn:hover {
+      border-color: var(--gold);
+      box-shadow: 0 0 16px var(--gold-glow);
+    }
+
+    .todo-list {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .todo-row {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .todo-title {
+      color: var(--text-primary);
+      font-size: 15px;
+      line-height: 1.3;
+    }
+
+    .todo-title.done {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .tag {
+      border-radius: 50px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .tag.high {
+      border-color: rgba(245,200,66,0.4);
+      color: var(--gold);
+      background: rgba(245,200,66,0.1);
+    }
+
+    .rpg-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .slot-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .slot-card {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px;
+      min-height: 72px;
+    }
+
+    .slot-name {
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    .slot-item {
+      color: var(--text-primary);
+      font-size: 13px;
+    }
+
+    .slot-empty {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .inventory-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .inventory-row {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .skills-row {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .skill-pill {
+      border: 1px solid rgba(168,85,247,0.4);
+      background: rgba(168,85,247,0.12);
+      color: #d7b4ff;
+      border-radius: 50px;
+      padding: 6px 10px;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    .battle-stats {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .battle-stat {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      text-align: center;
+      padding: 8px 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .battle-controls {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .battle-log {
+      margin-top: 12px;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      min-height: 42px;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .task-create-row { grid-template-columns: 1fr; }
+      .rpg-grid { grid-template-columns: 1fr; }
+      .battle-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* ============================================================
        LOADING STATE
        ============================================================ */
     #loading-screen {
@@ -1346,6 +1580,62 @@
     </div>
   </div>
 
+  <!-- TASKS -->
+  <div class="task-section">
+    <div class="section-heading">🧾 Todo Quest Board</div>
+    <div class="task-create-card">
+      <div>Create a task with importance from 5 to 10. Completing tasks grants XP, achievements, and loot.</div>
+      <div class="task-create-row">
+        <input id="task-title-input" class="task-input" type="text" maxlength="120" placeholder="Add a task..." />
+        <select id="task-importance-input" class="task-select">
+          <option value="5">Importance 5</option>
+          <option value="6">Importance 6</option>
+          <option value="7">Importance 7</option>
+          <option value="8">Importance 8</option>
+          <option value="9">Importance 9</option>
+          <option value="10" selected>Importance 10</option>
+        </select>
+        <button class="quest-btn" onclick="addTask()">Add Task</button>
+      </div>
+    </div>
+    <div class="todo-list" id="todo-list"></div>
+  </div>
+
+  <!-- RPG -->
+  <div class="rpg-section">
+    <div class="section-heading">🛡 Character, Slots, Skills</div>
+    <div class="rpg-grid">
+      <div class="rpg-card">
+        <div><strong>Equipment Slots</strong> (Diablo style)</div>
+        <div class="slot-grid" id="slot-grid"></div>
+      </div>
+      <div class="rpg-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <strong>Randomized Skills</strong>
+          <button class="quest-btn warn" onclick="rerollSkills()">Reroll</button>
+        </div>
+        <div class="skills-row" id="skills-row"></div>
+        <div style="margin-top:12px;"><strong>Inventory</strong></div>
+        <div class="inventory-list" id="inventory-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MINI GAME -->
+  <div class="minigame-section">
+    <div class="section-heading">⚔ Mini Game Arena</div>
+    <div class="battle-card">
+      <div>Fight a random foe using your skills and gear. Victories grant XP and items.</div>
+      <div class="battle-stats" id="battle-stats"></div>
+      <div class="battle-controls">
+        <button class="quest-btn" onclick="startBattle()">Start Battle</button>
+        <button class="quest-btn" onclick="battleAttack()">Attack</button>
+        <button class="quest-btn warn" onclick="battleSkill()">Use Skill</button>
+      </div>
+      <div class="battle-log" id="battle-log">No battle yet. Start one to enter the arena.</div>
+    </div>
+  </div>
+
   <!-- HISTORY -->
   <div class="history-section">
     <div class="section-heading">📋 Activity Log</div>
@@ -1394,6 +1684,33 @@ const LEVEL_CONFIG = [
 
 const XP_BASE = 10; // base XP per question
 
+const TASK_IMPORTANCE_MIN = 5;
+const TASK_IMPORTANCE_MAX = 10;
+
+const SKILL_POOL = [
+  { id: 'arc_bolt',       name: 'Arc Bolt',       power: 1.45 },
+  { id: 'shadow_nova',    name: 'Shadow Nova',    power: 1.7  },
+  { id: 'frost_spike',    name: 'Frost Spike',    power: 1.55 },
+  { id: 'ember_wave',     name: 'Ember Wave',     power: 1.6  },
+  { id: 'storm_lance',    name: 'Storm Lance',    power: 1.8  },
+  { id: 'astral_cleave',  name: 'Astral Cleave',  power: 1.65 },
+];
+
+const ITEM_TEMPLATES = [
+  { slot: 'helm',   names: ['Iron Visor', 'Rune Helm', 'Lion Crest'],   atk: [0, 2], def: [2, 5] },
+  { slot: 'chest',  names: ['Scale Armor', 'Night Plate', 'Aegis Mail'],atk: [0, 1], def: [4, 8] },
+  { slot: 'gloves', names: ['Grip Gloves', 'Swift Mitts', 'Fang Grips'],atk: [1, 3], def: [1, 3] },
+  { slot: 'pants',  names: ['Guard Greaves', 'Dusk Leggings'],           atk: [0, 1], def: [3, 6] },
+  { slot: 'boots',  names: ['Trail Boots', 'Windstep Boots'],            atk: [0, 1], def: [2, 4] },
+  { slot: 'weapon', names: ['Bone Blade', 'Storm Staff', 'Moon Axe'],    atk: [4, 8], def: [0, 2] },
+  { slot: 'offhand',names: ['Ward Totem', 'Mirror Shield'],              atk: [1, 3], def: [2, 5] },
+  { slot: 'ring1',  names: ['Ring of Sparks', 'Band of Focus'],          atk: [1, 3], def: [1, 2] },
+  { slot: 'ring2',  names: ['Ring of Echoes', 'Band of Will'],           atk: [1, 3], def: [1, 2] },
+  { slot: 'amulet', names: ['Sun Amulet', 'Void Pendant'],               atk: [1, 4], def: [1, 3] },
+];
+
+const EQUIPMENT_SLOTS = ['helm', 'chest', 'gloves', 'pants', 'boots', 'weapon', 'offhand', 'ring1', 'ring2', 'amulet'];
+
 /* ─────────────────────────────────────────────
    ACHIEVEMENT DEFINITIONS
    ───────────────────────────────────────────── */
@@ -1412,6 +1729,11 @@ const ACHIEVEMENTS_DEF = [
   { id: "level_5",           icon: "🧙", name: "Reasoning Mage",    desc: "Reach Level 5",                            threshold: 5,    stat: "level"     },
   { id: "level_10",          icon: "🏆", name: "Polymath Legend",   desc: "Reach the maximum Level 10",               threshold: 10,   stat: "level"     },
   { id: "weekly_50",         icon: "📚", name: "Weekly Scholar",    desc: "Add 50 questions in one week",             threshold: 50,   stat: "week"      },
+  { id: "task_starter",      icon: "✅", name: "Task Starter",      desc: "Complete your first todo task",            threshold: 1,    stat: "tasks"     },
+  { id: "task_commander",    icon: "📌", name: "Task Commander",    desc: "Complete 25 todo tasks",                   threshold: 25,   stat: "tasks"     },
+  { id: "loot_hunter",       icon: "🧰", name: "Loot Hunter",       desc: "Collect 10 inventory items",               threshold: 10,   stat: "items"     },
+  { id: "arena_winner",      icon: "⚔️", name: "Arena Winner",      desc: "Win 3 mini-game battles",                  threshold: 3,    stat: "wins"      },
+  { id: "arena_champion",    icon: "🛡️", name: "Arena Champion",    desc: "Win 15 mini-game battles",                 threshold: 15,   stat: "wins"      },
 ];
 
 /* ─────────────────────────────────────────────
@@ -1480,6 +1802,91 @@ function formatTime(ts) {
   const d = ts.toDate ? ts.toDate() : new Date(ts);
   const h = d.getHours(), m = d.getMinutes(), s = d.getSeconds();
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function sample(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function randomId(prefix = 'id') {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function rollSkills(count = 3) {
+  const clone = [...SKILL_POOL];
+  const picked = [];
+  while (clone.length && picked.length < count) {
+    const i = randomInt(0, clone.length - 1);
+    picked.push(clone[i]);
+    clone.splice(i, 1);
+  }
+  return picked;
+}
+
+function createRandomItem() {
+  const template = sample(ITEM_TEMPLATES);
+  return {
+    id: randomId('item'),
+    slot: template.slot,
+    name: sample(template.names),
+    atk: randomInt(template.atk[0], template.atk[1]),
+    def: randomInt(template.def[0], template.def[1]),
+    rarity: sample(['Common', 'Magic', 'Rare']),
+    createdAt: new Date().toISOString(),
+  };
+}
+
+function getBaseEquipment() {
+  return EQUIPMENT_SLOTS.reduce((acc, slot) => {
+    acc[slot] = null;
+    return acc;
+  }, {});
+}
+
+function ensureRpgDefaults(data) {
+  data.todoTasks = Array.isArray(data.todoTasks) ? data.todoTasks : [];
+  data.completedTasks = Number(data.completedTasks || 0);
+  data.inventory = Array.isArray(data.inventory) ? data.inventory : [];
+  data.equipment = data.equipment && typeof data.equipment === 'object' ? data.equipment : {};
+  for (const slot of EQUIPMENT_SLOTS) {
+    if (!Object.prototype.hasOwnProperty.call(data.equipment, slot)) data.equipment[slot] = null;
+  }
+  data.skills = Array.isArray(data.skills) && data.skills.length ? data.skills : rollSkills(3);
+  data.miniGame = data.miniGame && typeof data.miniGame === 'object' ? data.miniGame : {};
+  data.miniGame.wins = Number(data.miniGame.wins || 0);
+  data.miniGame.plays = Number(data.miniGame.plays || 0);
+  data.miniGame.inBattle = !!data.miniGame.inBattle;
+  data.miniGame.playerHp = Number(data.miniGame.playerHp || 100);
+  data.miniGame.enemyHp = Number(data.miniGame.enemyHp || 0);
+  data.miniGame.enemyMaxHp = Number(data.miniGame.enemyMaxHp || 0);
+  data.miniGame.enemyPower = Number(data.miniGame.enemyPower || 0);
+  data.miniGame.enemyName = data.miniGame.enemyName || '';
+  data.miniGame.log = data.miniGame.log || 'No battle yet. Start one to enter the arena.';
+}
+
+function getCharacterStats() {
+  const equipment = userData.equipment || {};
+  const totalAtk = EQUIPMENT_SLOTS.reduce((sum, slot) => sum + Number((equipment[slot] && equipment[slot].atk) || 0), 0);
+  const totalDef = EQUIPMENT_SLOTS.reduce((sum, slot) => sum + Number((equipment[slot] && equipment[slot].def) || 0), 0);
+  const level = getLevelInfo(userData.totalXP || 0).level;
+  return {
+    maxHp: 100 + level * 8 + totalDef * 2,
+    atk: 8 + level * 2 + totalAtk,
+    def: 3 + Math.floor(level / 2) + totalDef,
+  };
 }
 
 /* ─────────────────────────────────────────────
@@ -1556,6 +1963,22 @@ async function loadUserData(uid) {
       yearlyCounts:   {},
       achievements:   {},
       recentLog:      [],
+      todoTasks:      [],
+      completedTasks: 0,
+      inventory:      [],
+      equipment:      getBaseEquipment(),
+      skills:         rollSkills(3),
+      miniGame: {
+        wins: 0,
+        plays: 0,
+        inBattle: false,
+        playerHp: 100,
+        enemyHp: 0,
+        enemyMaxHp: 0,
+        enemyPower: 0,
+        enemyName: '',
+        log: 'No battle yet. Start one to enter the arena.',
+      },
     };
     await ref.set(fresh);
     return { ...fresh, _ref: ref };
@@ -1600,16 +2023,21 @@ function updateStreak() {
    ACHIEVEMENT CHECKER
    ───────────────────────────────────────────── */
 
-function checkAchievements(todayCount, weekCount) {
+function checkAchievements() {
   const newlyUnlocked = [];
+  const today = getDateKey();
+  const weekKey = getWeekKey();
   const levelInfo = getLevelInfo(userData.totalXP);
 
   const statMap = {
     total:  userData.totalQuestions,
-    today:  todayCount,
+    today:  userData.dailyCounts[today] || 0,
     streak: userData.streak,
     level:  levelInfo.level,
-    week:   weekCount,
+    week:   userData.weeklyCounts[weekKey] || 0,
+    tasks:  userData.completedTasks || 0,
+    items:  (userData.inventory || []).length + EQUIPMENT_SLOTS.filter((slot) => !!userData.equipment[slot]).length,
+    wins:   (userData.miniGame && userData.miniGame.wins) || 0,
   };
 
   for (const ach of ACHIEVEMENTS_DEF) {
@@ -1623,6 +2051,15 @@ function checkAchievements(todayCount, weekCount) {
   }
 
   return newlyUnlocked;
+}
+
+function addLogEntry(text, xp) {
+  const logEntry = {
+    ts: new Date().toISOString(),
+    text,
+    xp: Number(xp || 0),
+  };
+  userData.recentLog = [logEntry, ...(userData.recentLog || [])].slice(0, 50);
 }
 
 /* ─────────────────────────────────────────────
@@ -1667,16 +2104,10 @@ async function addQuestion() {
   updateStreak();
 
   // Log entry
-  const logEntry = {
-    ts:  new Date().toISOString(),
-    text: `Added question #${userData.totalQuestions}`,
-    xp:  xpGained,
-  };
-  userData.recentLog = [logEntry, ...(userData.recentLog || [])].slice(0, 50);
+  addLogEntry(`Added question #${userData.totalQuestions}`, xpGained);
 
   // Check achievements
-  const weekCount  = userData.weeklyCounts[weekKey] || 0;
-  const newBadges  = checkAchievements(todayCount, weekCount);
+  const newBadges  = checkAchievements();
 
   // Save to Firestore
   try {
@@ -1704,6 +2135,182 @@ async function addQuestion() {
   renderAll();
 
   setTimeout(() => { isAdding = false; }, 300);
+}
+
+async function addTask() {
+  if (!userData || !currentUser) return;
+  const titleInput = document.getElementById('task-title-input');
+  const importanceInput = document.getElementById('task-importance-input');
+  const title = titleInput.value.trim();
+  const importance = Number(importanceInput.value || TASK_IMPORTANCE_MIN);
+
+  if (!title) return;
+  if (importance < TASK_IMPORTANCE_MIN || importance > TASK_IMPORTANCE_MAX) {
+    alert(`Importance must be between ${TASK_IMPORTANCE_MIN} and ${TASK_IMPORTANCE_MAX}.`);
+    return;
+  }
+
+  userData.todoTasks.unshift({
+    id: randomId('task'),
+    title,
+    importance,
+    completed: false,
+    createdAt: new Date().toISOString(),
+    completedAt: null,
+  });
+  userData.todoTasks = userData.todoTasks.slice(0, 200);
+
+  addLogEntry(`Added todo task: ${title}`, 0);
+  titleInput.value = '';
+  importanceInput.value = String(TASK_IMPORTANCE_MAX);
+  await saveUserData();
+  renderAll();
+}
+
+async function completeTask(taskId) {
+  if (!userData || !currentUser) return;
+  const task = (userData.todoTasks || []).find((t) => t.id === taskId);
+  if (!task || task.completed) return;
+
+  task.completed = true;
+  task.completedAt = new Date().toISOString();
+  userData.completedTasks = (userData.completedTasks || 0) + 1;
+
+  const xp = task.importance * 4;
+  const prevLevel = getLevelInfo(userData.totalXP).level;
+  userData.totalXP = (userData.totalXP || 0) + xp;
+  const newLevel = getLevelInfo(userData.totalXP).level;
+
+  const loot = createRandomItem();
+  userData.inventory.unshift(loot);
+
+  addLogEntry(`Completed task: ${task.title} (Imp ${task.importance})`, xp);
+  addLogEntry(`Loot gained: ${loot.name} [${loot.slot}]`, 0);
+
+  const newBadges = checkAchievements();
+  await saveUserData();
+  renderAll();
+  showXpPopup(xp, document.getElementById('level-number'));
+
+  if (newLevel > prevLevel) {
+    const info = getLevelInfo(userData.totalXP);
+    showLevelUpToast(newLevel, info.title);
+    launchConfetti();
+  } else if (newBadges.length > 0) {
+    showBadgeToast(newBadges[0]);
+  }
+}
+
+async function equipItem(itemId) {
+  if (!userData || !currentUser) return;
+  const idx = userData.inventory.findIndex((it) => it.id === itemId);
+  if (idx < 0) return;
+  const item = userData.inventory[idx];
+  const slot = item.slot;
+  const currentlyEquipped = userData.equipment[slot];
+
+  if (currentlyEquipped) {
+    userData.inventory.unshift(currentlyEquipped);
+  }
+  userData.equipment[slot] = item;
+  userData.inventory.splice(idx, 1);
+  addLogEntry(`Equipped ${item.name} to ${slot}`, 0);
+  await saveUserData();
+  renderAll();
+}
+
+async function unequipSlot(slot) {
+  if (!userData || !currentUser) return;
+  const item = userData.equipment[slot];
+  if (!item) return;
+  userData.inventory.unshift(item);
+  userData.equipment[slot] = null;
+  addLogEntry(`Unequipped ${item.name} from ${slot}`, 0);
+  await saveUserData();
+  renderAll();
+}
+
+async function rerollSkills() {
+  if (!userData || !currentUser) return;
+  userData.skills = rollSkills(3);
+  addLogEntry(`Rerolled random skills`, 0);
+  await saveUserData();
+  renderAll();
+}
+
+async function startBattle() {
+  if (!userData || !currentUser) return;
+  const stats = getCharacterStats();
+  const level = getLevelInfo(userData.totalXP || 0).level;
+  const enemyLevel = Math.max(1, level + randomInt(-1, 2));
+  userData.miniGame.inBattle = true;
+  userData.miniGame.playerHp = stats.maxHp;
+  userData.miniGame.enemyMaxHp = 60 + enemyLevel * 14 + randomInt(0, 18);
+  userData.miniGame.enemyHp = userData.miniGame.enemyMaxHp;
+  userData.miniGame.enemyPower = 6 + enemyLevel * 2;
+  userData.miniGame.enemyName = sample(['Blood Wraith', 'Ash Reaver', 'Crypt Fiend', 'Storm Ghoul']);
+  userData.miniGame.log = `${userData.miniGame.enemyName} appears with ${userData.miniGame.enemyHp} HP.`;
+  await saveUserData();
+  renderMiniGame();
+}
+
+async function battleAttack() {
+  await resolveBattleTurn(false);
+}
+
+async function battleSkill() {
+  await resolveBattleTurn(true);
+}
+
+async function resolveBattleTurn(useSkill) {
+  if (!userData || !currentUser) return;
+  if (!userData.miniGame.inBattle) {
+    userData.miniGame.log = 'Start a battle first.';
+    renderMiniGame();
+    return;
+  }
+
+  const stats = getCharacterStats();
+  let damage = stats.atk + randomInt(2, 7);
+  let skillText = '';
+  if (useSkill && userData.skills.length) {
+    const skill = sample(userData.skills);
+    damage = Math.round(damage * Number(skill.power || 1.5));
+    skillText = ` using ${skill.name}`;
+  }
+
+  userData.miniGame.enemyHp = Math.max(0, userData.miniGame.enemyHp - damage);
+  if (userData.miniGame.enemyHp <= 0) {
+    const winXp = 25 + randomInt(0, 20);
+    userData.totalXP = (userData.totalXP || 0) + winXp;
+    userData.miniGame.wins = (userData.miniGame.wins || 0) + 1;
+    userData.miniGame.plays = (userData.miniGame.plays || 0) + 1;
+    userData.miniGame.inBattle = false;
+    const loot = createRandomItem();
+    userData.inventory.unshift(loot);
+    userData.miniGame.log = `You dealt ${damage}${skillText} and defeated ${userData.miniGame.enemyName}. +${winXp} XP and loot: ${loot.name}.`;
+    addLogEntry(`Won arena battle vs ${userData.miniGame.enemyName}`, winXp);
+    const badges = checkAchievements();
+    await saveUserData();
+    renderAll();
+    if (badges.length) showBadgeToast(badges[0]);
+    return;
+  }
+
+  const enemyDamage = Math.max(1, userData.miniGame.enemyPower + randomInt(0, 5) - stats.def);
+  userData.miniGame.playerHp = Math.max(0, userData.miniGame.playerHp - enemyDamage);
+
+  if (userData.miniGame.playerHp <= 0) {
+    userData.miniGame.inBattle = false;
+    userData.miniGame.plays = (userData.miniGame.plays || 0) + 1;
+    userData.miniGame.log = `You dealt ${damage}${skillText}, but ${userData.miniGame.enemyName} defeated you.`;
+    addLogEntry(`Lost arena battle vs ${userData.miniGame.enemyName}`, 0);
+  } else {
+    userData.miniGame.log = `You hit for ${damage}${skillText}. ${userData.miniGame.enemyName} hits back for ${enemyDamage}.`;
+  }
+
+  await saveUserData();
+  renderMiniGame();
 }
 
 /* ─────────────────────────────────────────────
@@ -1836,6 +2443,9 @@ function renderAll() {
   renderChart();
   renderMilestones();
   renderAchievements();
+  renderTodoList();
+  renderRpgPanel();
+  renderMiniGame();
   renderLog();
 }
 
@@ -2082,6 +2692,9 @@ function renderAchievements() {
     streak: userData.streak || 0,
     level:  getLevelInfo(userData.totalXP || 0).level,
     week:   userData.weeklyCounts[weekKey] || 0,
+    tasks:  userData.completedTasks || 0,
+    items:  (userData.inventory || []).length + EQUIPMENT_SLOTS.filter((slot) => !!userData.equipment[slot]).length,
+    wins:   (userData.miniGame && userData.miniGame.wins) || 0,
   };
 
   for (const ach of ACHIEVEMENTS_DEF) {
@@ -2100,6 +2713,101 @@ function renderAchievements() {
       </div>
     `;
     grid.appendChild(card);
+  }
+}
+
+function renderTodoList() {
+  const todoList = document.getElementById('todo-list');
+  if (!todoList) return;
+  const tasks = userData.todoTasks || [];
+  if (!tasks.length) {
+    todoList.innerHTML = '<div class="log-empty">No tasks yet — add a task to begin your todo quest.</div>';
+    return;
+  }
+
+  todoList.innerHTML = '';
+  for (const task of tasks) {
+    const row = document.createElement('div');
+    row.className = 'todo-row';
+    row.innerHTML = `
+      <div class="todo-title ${task.completed ? 'done' : ''}">${escapeHtml(task.title)}</div>
+      <span class="tag ${task.importance >= 9 ? 'high' : ''}">Imp ${task.importance}</span>
+      ${task.completed
+        ? '<span class="tag">Done</span>'
+        : `<button class="quest-btn" onclick="completeTask('${task.id}')">Complete</button>`}
+    `;
+    todoList.appendChild(row);
+  }
+}
+
+function renderRpgPanel() {
+  const slotGrid = document.getElementById('slot-grid');
+  const skillsRow = document.getElementById('skills-row');
+  const inventoryList = document.getElementById('inventory-list');
+  if (!slotGrid || !skillsRow || !inventoryList) return;
+
+  const prettySlot = {
+    helm: 'Helm', chest: 'Chest', gloves: 'Gloves', pants: 'Pants', boots: 'Boots',
+    weapon: 'Weapon', offhand: 'Offhand', ring1: 'Ring 1', ring2: 'Ring 2', amulet: 'Amulet',
+  };
+
+  slotGrid.innerHTML = '';
+  for (const slot of EQUIPMENT_SLOTS) {
+    const item = userData.equipment[slot];
+    const el = document.createElement('div');
+    el.className = 'slot-card';
+    el.innerHTML = `
+      <div class="slot-name">${prettySlot[slot]}</div>
+      ${item
+        ? `<div class="slot-item">${item.name}<br/>ATK +${item.atk} · DEF +${item.def}</div>
+           <button class="quest-btn" style="margin-top:6px;padding:6px 8px;font-size:11px;" onclick="unequipSlot('${slot}')">Unequip</button>`
+        : '<div class="slot-empty">Empty slot</div>'}
+    `;
+    slotGrid.appendChild(el);
+  }
+
+  skillsRow.innerHTML = '';
+  for (const skill of userData.skills || []) {
+    const pill = document.createElement('span');
+    pill.className = 'skill-pill';
+    pill.textContent = `${skill.name} x${Number(skill.power || 1).toFixed(2)}`;
+    skillsRow.appendChild(pill);
+  }
+
+  inventoryList.innerHTML = '';
+  if (!(userData.inventory || []).length) {
+    inventoryList.innerHTML = '<div class="slot-empty">No items yet. Complete tasks or win battles for drops.</div>';
+    return;
+  }
+
+  for (const item of userData.inventory) {
+    const row = document.createElement('div');
+    row.className = 'inventory-row';
+    row.innerHTML = `
+      <div>${item.name} · ${item.slot}<br/><span class="slot-empty">${item.rarity} · ATK +${item.atk} · DEF +${item.def}</span></div>
+      <button class="quest-btn" style="padding:6px 8px;font-size:11px;" onclick="equipItem('${item.id}')">Equip</button>
+    `;
+    inventoryList.appendChild(row);
+  }
+}
+
+function renderMiniGame() {
+  const battleStats = document.getElementById('battle-stats');
+  const battleLog = document.getElementById('battle-log');
+  if (!battleStats || !battleLog) return;
+  const stats = getCharacterStats();
+  const game = userData.miniGame;
+  battleStats.innerHTML = `
+    <div class="battle-stat">HP<br/><strong>${game.inBattle ? game.playerHp : stats.maxHp}</strong></div>
+    <div class="battle-stat">ATK<br/><strong>${stats.atk}</strong></div>
+    <div class="battle-stat">DEF<br/><strong>${stats.def}</strong></div>
+    <div class="battle-stat">Wins / Plays<br/><strong>${game.wins} / ${game.plays}</strong></div>
+  `;
+
+  if (game.inBattle) {
+    battleLog.textContent = `${game.enemyName} HP ${game.enemyHp}/${game.enemyMaxHp} · ${game.log}`;
+  } else {
+    battleLog.textContent = game.log || 'No battle yet. Start one to enter the arena.';
   }
 }
 
@@ -2126,7 +2834,7 @@ function renderLog() {
     row.innerHTML = `
       <div class="log-dot"></div>
       <div class="log-text">
-        <strong>${entry.text}</strong>
+        <strong>${escapeHtml(entry.text)}</strong>
         &nbsp;·&nbsp;
         <span class="xp-highlight">+${entry.xp} XP</span>
       </div>
@@ -2147,6 +2855,7 @@ auth.onAuthStateChanged(async (user) => {
 
     try {
       userData = await loadUserData(user.uid);
+      ensureRpgDefaults(userData);
     } catch (e) {
       console.error("Failed to load data:", e);
       userData = {
@@ -2154,6 +2863,9 @@ auth.onAuthStateChanged(async (user) => {
         lastActiveDate: null, longestStreak: 0,
         dailyCounts: {}, weeklyCounts: {}, monthlyCounts: {}, yearlyCounts: {},
         achievements: {}, recentLog: [],
+        todoTasks: [], completedTasks: 0, inventory: [],
+        equipment: getBaseEquipment(), skills: rollSkills(3),
+        miniGame: { wins: 0, plays: 0, inBattle: false, playerHp: 100, enemyHp: 0, enemyMaxHp: 0, enemyPower: 0, enemyName: '', log: 'No battle yet. Start one to enter the arena.' },
       };
     }
 
