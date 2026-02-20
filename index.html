@@ -1755,6 +1755,7 @@ let currentUser = null;
 let userData    = null;        // live Firestore doc data
 let activeTab   = 'daily';
 let isAdding    = false;       // debounce flag
+let userDocUnsubscribe = null;
 
 /* ─────────────────────────────────────────────
    UTILITY HELPERS
@@ -1889,6 +1890,102 @@ function getCharacterStats() {
   };
 }
 
+function mergeCountMaps(serverMap = {}, localMap = {}) {
+  const merged = { ...serverMap };
+  for (const [k, v] of Object.entries(localMap || {})) {
+    merged[k] = Math.max(Number(merged[k] || 0), Number(v || 0));
+  }
+  return merged;
+}
+
+function mergeTaskLists(serverTasks = [], localTasks = []) {
+  const byId = {};
+  for (const task of [...serverTasks, ...localTasks]) {
+    if (!task || !task.id) continue;
+    const prev = byId[task.id];
+    if (!prev) byId[task.id] = { ...task };
+    else {
+      byId[task.id] = {
+        ...prev,
+        ...task,
+        completed: !!(prev.completed || task.completed),
+        completedAt: prev.completedAt || task.completedAt || null,
+      };
+    }
+  }
+  return Object.values(byId)
+    .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))
+    .slice(0, 200);
+}
+
+function mergeInventory(serverInventory = [], localInventory = []) {
+  const byId = {};
+  for (const item of [...serverInventory, ...localInventory]) {
+    if (!item || !item.id) continue;
+    byId[item.id] = byId[item.id] ? { ...byId[item.id], ...item } : { ...item };
+  }
+  return Object.values(byId)
+    .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))
+    .slice(0, 300);
+}
+
+function mergeRecentLog(serverLog = [], localLog = []) {
+  const seen = new Set();
+  const merged = [];
+  for (const entry of [...localLog, ...serverLog]) {
+    if (!entry) continue;
+    const key = `${entry.ts || ''}|${entry.text || ''}|${entry.xp || 0}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(entry);
+  }
+  return merged
+    .sort((a, b) => String(b.ts || '').localeCompare(String(a.ts || '')))
+    .slice(0, 50);
+}
+
+function mergeUserRecords(serverData = {}, localData = {}) {
+  const merged = {
+    totalXP: Math.max(Number(serverData.totalXP || 0), Number(localData.totalXP || 0)),
+    totalQuestions: Math.max(Number(serverData.totalQuestions || 0), Number(localData.totalQuestions || 0)),
+    streak: Math.max(Number(serverData.streak || 0), Number(localData.streak || 0)),
+    longestStreak: Math.max(Number(serverData.longestStreak || 0), Number(localData.longestStreak || 0)),
+    completedTasks: Math.max(Number(serverData.completedTasks || 0), Number(localData.completedTasks || 0)),
+    lastActiveDate: String(serverData.lastActiveDate || '') > String(localData.lastActiveDate || '')
+      ? serverData.lastActiveDate
+      : localData.lastActiveDate,
+    dailyCounts: mergeCountMaps(serverData.dailyCounts, localData.dailyCounts),
+    weeklyCounts: mergeCountMaps(serverData.weeklyCounts, localData.weeklyCounts),
+    monthlyCounts: mergeCountMaps(serverData.monthlyCounts, localData.monthlyCounts),
+    yearlyCounts: mergeCountMaps(serverData.yearlyCounts, localData.yearlyCounts),
+    achievements: { ...(serverData.achievements || {}), ...(localData.achievements || {}) },
+    recentLog: mergeRecentLog(serverData.recentLog, localData.recentLog),
+    todoTasks: mergeTaskLists(serverData.todoTasks, localData.todoTasks),
+    inventory: mergeInventory(serverData.inventory, localData.inventory),
+    equipment: getBaseEquipment(),
+    skills: (localData.skills && localData.skills.length) ? localData.skills : ((serverData.skills && serverData.skills.length) ? serverData.skills : rollSkills(3)),
+    miniGame: {
+      wins: Math.max(Number((serverData.miniGame && serverData.miniGame.wins) || 0), Number((localData.miniGame && localData.miniGame.wins) || 0)),
+      plays: Math.max(Number((serverData.miniGame && serverData.miniGame.plays) || 0), Number((localData.miniGame && localData.miniGame.plays) || 0)),
+      inBattle: false,
+      playerHp: Math.max(Number((serverData.miniGame && serverData.miniGame.playerHp) || 100), Number((localData.miniGame && localData.miniGame.playerHp) || 100)),
+      enemyHp: 0,
+      enemyMaxHp: 0,
+      enemyPower: 0,
+      enemyName: '',
+      log: (localData.miniGame && localData.miniGame.log) || (serverData.miniGame && serverData.miniGame.log) || 'No battle yet. Start one to enter the arena.',
+    },
+  };
+
+  for (const slot of EQUIPMENT_SLOTS) {
+    const localItem = localData.equipment && localData.equipment[slot];
+    const serverItem = serverData.equipment && serverData.equipment[slot];
+    merged.equipment[slot] = localItem || serverItem || null;
+  }
+
+  return merged;
+}
+
 /* ─────────────────────────────────────────────
    AUTH FUNCTIONS
    ───────────────────────────────────────────── */
@@ -1904,6 +2001,10 @@ function signInWithGoogle() {
 
 function signOut() {
   auth.signOut().then(() => {
+    if (userDocUnsubscribe) {
+      userDocUnsubscribe();
+      userDocUnsubscribe = null;
+    }
     currentUser = null;
     userData    = null;
     showScreen('login');
@@ -1987,8 +2088,34 @@ async function loadUserData(uid) {
 
 async function saveUserData() {
   if (!userData || !userData._ref) return;
-  const { _ref, ...toSave } = userData;
-  await _ref.set(toSave, { merge: true });
+  const { _ref, ...localData } = userData;
+  const serverSnap = await _ref.get();
+  const serverData = serverSnap.exists ? serverSnap.data() : {};
+  const merged = mergeUserRecords(serverData, localData);
+  merged.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+  await _ref.set(merged, { merge: true });
+  userData = { ...merged, _ref };
+}
+
+function startUserDataSync(uid) {
+  if (userDocUnsubscribe) {
+    userDocUnsubscribe();
+    userDocUnsubscribe = null;
+  }
+  const ref = db.collection('cerquest_users').doc(uid);
+  userDocUnsubscribe = ref.onSnapshot((snap) => {
+    if (!snap.exists) return;
+    const incoming = { ...snap.data(), _ref: ref };
+    if (!userData) {
+      userData = incoming;
+    } else {
+      userData = { ...mergeUserRecords(userData, incoming), _ref: ref };
+    }
+    ensureRpgDefaults(userData);
+    if (currentUser) renderAll();
+  }, (err) => {
+    console.error('Live sync error:', err);
+  });
 }
 
 /* ─────────────────────────────────────────────
@@ -2878,8 +3005,13 @@ auth.onAuthStateChanged(async (user) => {
     }
 
     renderAll();
+    startUserDataSync(user.uid);
     showScreen('main');
   } else {
+    if (userDocUnsubscribe) {
+      userDocUnsubscribe();
+      userDocUnsubscribe = null;
+    }
     showScreen('login');
   }
 });
