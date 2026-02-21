@@ -1890,6 +1890,18 @@ function getCharacterStats() {
   };
 }
 
+function getCharacterStatsFromData(data) {
+  const equipment = data.equipment || {};
+  const totalAtk = EQUIPMENT_SLOTS.reduce((sum, slot) => sum + Number((equipment[slot] && equipment[slot].atk) || 0), 0);
+  const totalDef = EQUIPMENT_SLOTS.reduce((sum, slot) => sum + Number((equipment[slot] && equipment[slot].def) || 0), 0);
+  const level = getLevelInfo(data.totalXP || 0).level;
+  return {
+    maxHp: 100 + level * 8 + totalDef * 2,
+    atk: 8 + level * 2 + totalAtk,
+    def: 3 + Math.floor(level / 2) + totalDef,
+  };
+}
+
 function mergeCountMaps(serverMap = {}, localMap = {}) {
   const merged = { ...serverMap };
   for (const [k, v] of Object.entries(localMap || {})) {
@@ -2118,31 +2130,48 @@ function startUserDataSync(uid) {
   });
 }
 
+async function runUserTransaction(mutator) {
+  if (!currentUser) throw new Error('Not signed in');
+  const ref = db.collection('cerquest_users').doc(currentUser.uid);
+  const txResult = await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const base = snap.exists ? snap.data() : {};
+    ensureRpgDefaults(base);
+    const result = mutator(base) || {};
+    base.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+    tx.set(ref, base, { merge: true });
+    return { data: base, result };
+  });
+  userData = { ...txResult.data, _ref: ref };
+  ensureRpgDefaults(userData);
+  return txResult.result;
+}
+
 /* ─────────────────────────────────────────────
    STREAK LOGIC
    ───────────────────────────────────────────── */
 
-function updateStreak() {
+function updateStreakForData(data) {
   const today     = getDateKey();
   const yesterday = getDateKey(new Date(Date.now() - 86400000));
 
-  if (userData.lastActiveDate === today) {
+  if (data.lastActiveDate === today) {
     // Already counted today – no change
     return;
-  } else if (userData.lastActiveDate === yesterday) {
+  } else if (data.lastActiveDate === yesterday) {
     // Extend streak
-    userData.streak += 1;
-  } else if (userData.lastActiveDate === null) {
+    data.streak += 1;
+  } else if (data.lastActiveDate === null) {
     // First ever
-    userData.streak = 1;
+    data.streak = 1;
   } else {
     // Streak broken
-    userData.streak = 1;
+    data.streak = 1;
   }
 
-  userData.lastActiveDate = today;
-  if (userData.streak > (userData.longestStreak || 0)) {
-    userData.longestStreak = userData.streak;
+  data.lastActiveDate = today;
+  if (data.streak > (data.longestStreak || 0)) {
+    data.longestStreak = data.streak;
   }
 }
 
@@ -2150,28 +2179,28 @@ function updateStreak() {
    ACHIEVEMENT CHECKER
    ───────────────────────────────────────────── */
 
-function checkAchievements() {
+function checkAchievementsForData(data) {
   const newlyUnlocked = [];
   const today = getDateKey();
   const weekKey = getWeekKey();
-  const levelInfo = getLevelInfo(userData.totalXP);
+  const levelInfo = getLevelInfo(data.totalXP);
 
   const statMap = {
-    total:  userData.totalQuestions,
-    today:  userData.dailyCounts[today] || 0,
-    streak: userData.streak,
+    total:  data.totalQuestions,
+    today:  data.dailyCounts[today] || 0,
+    streak: data.streak,
     level:  levelInfo.level,
-    week:   userData.weeklyCounts[weekKey] || 0,
-    tasks:  userData.completedTasks || 0,
-    items:  (userData.inventory || []).length + EQUIPMENT_SLOTS.filter((slot) => !!userData.equipment[slot]).length,
-    wins:   (userData.miniGame && userData.miniGame.wins) || 0,
+    week:   data.weeklyCounts[weekKey] || 0,
+    tasks:  data.completedTasks || 0,
+    items:  (data.inventory || []).length + EQUIPMENT_SLOTS.filter((slot) => !!data.equipment[slot]).length,
+    wins:   (data.miniGame && data.miniGame.wins) || 0,
   };
 
   for (const ach of ACHIEVEMENTS_DEF) {
-    if (!userData.achievements[ach.id]) {
+    if (!data.achievements[ach.id]) {
       const val = statMap[ach.stat] || 0;
       if (val >= ach.threshold) {
-        userData.achievements[ach.id] = true;
+        data.achievements[ach.id] = true;
         newlyUnlocked.push(ach);
       }
     }
@@ -2180,13 +2209,21 @@ function checkAchievements() {
   return newlyUnlocked;
 }
 
-function addLogEntry(text, xp) {
+function checkAchievements() {
+  return checkAchievementsForData(userData);
+}
+
+function addLogEntryToData(data, text, xp) {
   const logEntry = {
     ts: new Date().toISOString(),
     text,
     xp: Number(xp || 0),
   };
-  userData.recentLog = [logEntry, ...(userData.recentLog || [])].slice(0, 50);
+  data.recentLog = [logEntry, ...(data.recentLog || [])].slice(0, 50);
+}
+
+function addLogEntry(text, xp) {
+  addLogEntryToData(userData, text, xp);
 }
 
 /* ─────────────────────────────────────────────
@@ -2205,42 +2242,45 @@ async function addQuestion() {
   // Ripple
   spawnRipple();
 
-  const today     = getDateKey();
-  const weekKey   = getWeekKey();
-  const monthKey  = getMonthKey();
-  const yearKey   = getYearKey();
-
-  // Increment counts
-  userData.totalQuestions             = (userData.totalQuestions || 0) + 1;
-  userData.dailyCounts[today]         = (userData.dailyCounts[today] || 0) + 1;
-  userData.weeklyCounts[weekKey]      = (userData.weeklyCounts[weekKey] || 0) + 1;
-  userData.monthlyCounts[monthKey]    = (userData.monthlyCounts[monthKey] || 0) + 1;
-  userData.yearlyCounts[yearKey]      = (userData.yearlyCounts[yearKey] || 0) + 1;
-
-  // XP calculation — bonus for combos!
-  const todayCount = userData.dailyCounts[today];
-  let xpGained = XP_BASE;
-  if (todayCount % 10 === 0) xpGained *= 2;    // Double XP every 10 today
-  if (todayCount % 25 === 0) xpGained *= 3;    // Triple XP at 25, 50, 75...
-
-  const prevLevel = getLevelInfo(userData.totalXP).level;
-  userData.totalXP = (userData.totalXP || 0) + xpGained;
-  const newLevel  = getLevelInfo(userData.totalXP).level;
-
-  // Streak
-  updateStreak();
-
-  // Log entry
-  addLogEntry(`Added question #${userData.totalQuestions}`, xpGained);
-
-  // Check achievements
-  const newBadges  = checkAchievements();
-
-  // Save to Firestore
+  let xpGained = 0;
+  let prevLevel = 0;
+  let newLevel = 0;
+  let newBadges = [];
   try {
-    await saveUserData();
+    const result = await runUserTransaction((data) => {
+      const today = getDateKey();
+      const weekKey = getWeekKey();
+      const monthKey = getMonthKey();
+      const yearKey = getYearKey();
+
+      data.totalQuestions = (data.totalQuestions || 0) + 1;
+      data.dailyCounts[today] = (data.dailyCounts[today] || 0) + 1;
+      data.weeklyCounts[weekKey] = (data.weeklyCounts[weekKey] || 0) + 1;
+      data.monthlyCounts[monthKey] = (data.monthlyCounts[monthKey] || 0) + 1;
+      data.yearlyCounts[yearKey] = (data.yearlyCounts[yearKey] || 0) + 1;
+
+      const todayCount = data.dailyCounts[today];
+      let gained = XP_BASE;
+      if (todayCount % 10 === 0) gained *= 2;
+      if (todayCount % 25 === 0) gained *= 3;
+
+      const previousLevel = getLevelInfo(data.totalXP || 0).level;
+      data.totalXP = (data.totalXP || 0) + gained;
+      const currentLevel = getLevelInfo(data.totalXP || 0).level;
+
+      updateStreakForData(data);
+      addLogEntryToData(data, `Added question #${data.totalQuestions}`, gained);
+      const badges = checkAchievementsForData(data);
+      return { gained, previousLevel, currentLevel, badges };
+    });
+    xpGained = result.gained;
+    prevLevel = result.previousLevel;
+    newLevel = result.currentLevel;
+    newBadges = result.badges;
   } catch (e) {
     console.error("Save error:", e);
+    isAdding = false;
+    return;
   }
 
   // Show XP popup
@@ -2248,7 +2288,7 @@ async function addQuestion() {
 
   // Level up?
   if (newLevel > prevLevel) {
-    const levelInfo = getLevelInfo(userData.totalXP);
+    const levelInfo = getLevelInfo(userData.totalXP || 0);
     setTimeout(() => showLevelUpToast(newLevel, levelInfo.title), 600);
     launchConfetti();
   }
@@ -2296,26 +2336,43 @@ async function addTask() {
 
 async function completeTask(taskId) {
   if (!userData || !currentUser) return;
-  const task = (userData.todoTasks || []).find((t) => t.id === taskId);
-  if (!task || task.completed) return;
+  let xp = 0;
+  let prevLevel = 0;
+  let newLevel = 0;
+  let newBadges = [];
+  let changed = false;
 
-  task.completed = true;
-  task.completedAt = new Date().toISOString();
-  userData.completedTasks = (userData.completedTasks || 0) + 1;
+  const result = await runUserTransaction((data) => {
+    const task = (data.todoTasks || []).find((t) => t.id === taskId);
+    if (!task || task.completed) {
+      return { changed: false, xp: 0, prevLevel: getLevelInfo(data.totalXP || 0).level, newLevel: getLevelInfo(data.totalXP || 0).level, badges: [] };
+    }
 
-  const xp = task.importance * 4;
-  const prevLevel = getLevelInfo(userData.totalXP).level;
-  userData.totalXP = (userData.totalXP || 0) + xp;
-  const newLevel = getLevelInfo(userData.totalXP).level;
+    task.completed = true;
+    task.completedAt = new Date().toISOString();
+    data.completedTasks = (data.completedTasks || 0) + 1;
 
-  const loot = createRandomItem();
-  userData.inventory.unshift(loot);
+    const gained = task.importance * 4;
+    const previousLevel = getLevelInfo(data.totalXP || 0).level;
+    data.totalXP = (data.totalXP || 0) + gained;
+    const currentLevel = getLevelInfo(data.totalXP || 0).level;
 
-  addLogEntry(`Completed task: ${task.title} (Imp ${task.importance})`, xp);
-  addLogEntry(`Loot gained: ${loot.name} [${loot.slot}]`, 0);
+    const loot = createRandomItem();
+    data.inventory.unshift(loot);
 
-  const newBadges = checkAchievements();
-  await saveUserData();
+    addLogEntryToData(data, `Completed task: ${task.title} (Imp ${task.importance})`, gained);
+    addLogEntryToData(data, `Loot gained: ${loot.name} [${loot.slot}]`, 0);
+    const badges = checkAchievementsForData(data);
+    return { changed: true, xp: gained, prevLevel: previousLevel, newLevel: currentLevel, badges };
+  });
+
+  changed = result.changed;
+  xp = result.xp;
+  prevLevel = result.prevLevel;
+  newLevel = result.newLevel;
+  newBadges = result.badges;
+  if (!changed) return;
+
   renderAll();
   showXpPopup(xp, document.getElementById('level-number'));
 
@@ -2367,17 +2424,18 @@ async function rerollSkills() {
 
 async function startBattle() {
   if (!userData || !currentUser) return;
-  const stats = getCharacterStats();
-  const level = getLevelInfo(userData.totalXP || 0).level;
-  const enemyLevel = Math.max(1, level + randomInt(-1, 2));
-  userData.miniGame.inBattle = true;
-  userData.miniGame.playerHp = stats.maxHp;
-  userData.miniGame.enemyMaxHp = 60 + enemyLevel * 14 + randomInt(0, 18);
-  userData.miniGame.enemyHp = userData.miniGame.enemyMaxHp;
-  userData.miniGame.enemyPower = 6 + enemyLevel * 2;
-  userData.miniGame.enemyName = sample(['Blood Wraith', 'Ash Reaver', 'Crypt Fiend', 'Storm Ghoul']);
-  userData.miniGame.log = `${userData.miniGame.enemyName} appears with ${userData.miniGame.enemyHp} HP.`;
-  await saveUserData();
+  await runUserTransaction((data) => {
+    const stats = getCharacterStatsFromData(data);
+    const level = getLevelInfo(data.totalXP || 0).level;
+    const enemyLevel = Math.max(1, level + randomInt(-1, 2));
+    data.miniGame.inBattle = true;
+    data.miniGame.playerHp = stats.maxHp;
+    data.miniGame.enemyMaxHp = 60 + enemyLevel * 14 + randomInt(0, 18);
+    data.miniGame.enemyHp = data.miniGame.enemyMaxHp;
+    data.miniGame.enemyPower = 6 + enemyLevel * 2;
+    data.miniGame.enemyName = sample(['Blood Wraith', 'Ash Reaver', 'Crypt Fiend', 'Storm Ghoul']);
+    data.miniGame.log = `${data.miniGame.enemyName} appears with ${data.miniGame.enemyHp} HP.`;
+  });
   renderMiniGame();
 }
 
@@ -2391,53 +2449,52 @@ async function battleSkill() {
 
 async function resolveBattleTurn(useSkill) {
   if (!userData || !currentUser) return;
-  if (!userData.miniGame.inBattle) {
-    userData.miniGame.log = 'Start a battle first.';
-    renderMiniGame();
-    return;
-  }
+  const result = await runUserTransaction((data) => {
+    if (!data.miniGame.inBattle) {
+      data.miniGame.log = 'Start a battle first.';
+      return { won: false, badges: [] };
+    }
 
-  const stats = getCharacterStats();
-  let damage = stats.atk + randomInt(2, 7);
-  let skillText = '';
-  if (useSkill && userData.skills.length) {
-    const skill = sample(userData.skills);
-    damage = Math.round(damage * Number(skill.power || 1.5));
-    skillText = ` using ${skill.name}`;
-  }
+    const stats = getCharacterStatsFromData(data);
+    let damage = stats.atk + randomInt(2, 7);
+    let skillText = '';
+    if (useSkill && data.skills.length) {
+      const skill = sample(data.skills);
+      damage = Math.round(damage * Number(skill.power || 1.5));
+      skillText = ` using ${skill.name}`;
+    }
 
-  userData.miniGame.enemyHp = Math.max(0, userData.miniGame.enemyHp - damage);
-  if (userData.miniGame.enemyHp <= 0) {
-    const winXp = 25 + randomInt(0, 20);
-    userData.totalXP = (userData.totalXP || 0) + winXp;
-    userData.miniGame.wins = (userData.miniGame.wins || 0) + 1;
-    userData.miniGame.plays = (userData.miniGame.plays || 0) + 1;
-    userData.miniGame.inBattle = false;
-    const loot = createRandomItem();
-    userData.inventory.unshift(loot);
-    userData.miniGame.log = `You dealt ${damage}${skillText} and defeated ${userData.miniGame.enemyName}. +${winXp} XP and loot: ${loot.name}.`;
-    addLogEntry(`Won arena battle vs ${userData.miniGame.enemyName}`, winXp);
-    const badges = checkAchievements();
-    await saveUserData();
-    renderAll();
-    if (badges.length) showBadgeToast(badges[0]);
-    return;
-  }
+    data.miniGame.enemyHp = Math.max(0, data.miniGame.enemyHp - damage);
+    if (data.miniGame.enemyHp <= 0) {
+      const winXp = 25 + randomInt(0, 20);
+      data.totalXP = (data.totalXP || 0) + winXp;
+      data.miniGame.wins = (data.miniGame.wins || 0) + 1;
+      data.miniGame.plays = (data.miniGame.plays || 0) + 1;
+      data.miniGame.inBattle = false;
+      const loot = createRandomItem();
+      data.inventory.unshift(loot);
+      data.miniGame.log = `You dealt ${damage}${skillText} and defeated ${data.miniGame.enemyName}. +${winXp} XP and loot: ${loot.name}.`;
+      addLogEntryToData(data, `Won arena battle vs ${data.miniGame.enemyName}`, winXp);
+      const badges = checkAchievementsForData(data);
+      return { won: true, badges };
+    }
 
-  const enemyDamage = Math.max(1, userData.miniGame.enemyPower + randomInt(0, 5) - stats.def);
-  userData.miniGame.playerHp = Math.max(0, userData.miniGame.playerHp - enemyDamage);
+    const enemyDamage = Math.max(1, data.miniGame.enemyPower + randomInt(0, 5) - stats.def);
+    data.miniGame.playerHp = Math.max(0, data.miniGame.playerHp - enemyDamage);
 
-  if (userData.miniGame.playerHp <= 0) {
-    userData.miniGame.inBattle = false;
-    userData.miniGame.plays = (userData.miniGame.plays || 0) + 1;
-    userData.miniGame.log = `You dealt ${damage}${skillText}, but ${userData.miniGame.enemyName} defeated you.`;
-    addLogEntry(`Lost arena battle vs ${userData.miniGame.enemyName}`, 0);
-  } else {
-    userData.miniGame.log = `You hit for ${damage}${skillText}. ${userData.miniGame.enemyName} hits back for ${enemyDamage}.`;
-  }
+    if (data.miniGame.playerHp <= 0) {
+      data.miniGame.inBattle = false;
+      data.miniGame.plays = (data.miniGame.plays || 0) + 1;
+      data.miniGame.log = `You dealt ${damage}${skillText}, but ${data.miniGame.enemyName} defeated you.`;
+      addLogEntryToData(data, `Lost arena battle vs ${data.miniGame.enemyName}`, 0);
+    } else {
+      data.miniGame.log = `You hit for ${damage}${skillText}. ${data.miniGame.enemyName} hits back for ${enemyDamage}.`;
+    }
+    return { won: false, badges: [] };
+  });
 
-  await saveUserData();
-  renderMiniGame();
+  renderAll();
+  if (result.won && result.badges.length) showBadgeToast(result.badges[0]);
 }
 
 /* ─────────────────────────────────────────────
