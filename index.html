@@ -608,6 +608,85 @@
       100% { transform: scale(2.5); opacity: 0; }
     }
 
+    .action-buttons-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .action-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .add-pushup-btn {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      border: none;
+      background: radial-gradient(circle at 35% 35%, #ff6b35, #cc3300 55%, #661a00);
+      box-shadow:
+        0 0 0 3px rgba(255,107,53,0.3),
+        0 0 40px rgba(255,60,0,0.4),
+        0 0 80px rgba(200,40,0,0.2),
+        0 8px 32px rgba(0,0,0,0.6);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .add-pushup-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+    }
+
+    .add-pushup-btn:hover {
+      transform: scale(1.08);
+      box-shadow:
+        0 0 0 4px rgba(255,107,53,0.5),
+        0 0 60px rgba(255,60,0,0.6),
+        0 0 100px rgba(200,40,0,0.3),
+        0 12px 40px rgba(0,0,0,0.6);
+    }
+
+    .add-pushup-btn:active {
+      transform: scale(0.95);
+    }
+
+    .add-pushup-btn.animate {
+      animation: btnPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .pushup-icon {
+      font-size: 40px;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pushup-num {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 20px rgba(255,107,53,0.8);
+      position: relative;
+      z-index: 1;
+    }
+
     .action-hint {
       margin-top: 16px;
       font-size: 13px;
@@ -1529,19 +1608,35 @@
     </div>
   </div>
 
-  <!-- ADD QUESTION BUTTON -->
+  <!-- ACTION BUTTONS -->
   <div class="action-section">
-    <div class="ripple-container" id="ripple-container"></div>
-    <button class="add-question-btn" id="add-btn" onclick="addQuestion()">
-      <div class="btn-plus">+</div>
-      <div class="btn-label">Add Question</div>
-    </button>
-    <div class="today-count-display">
-      <span>Today:</span>
-      <span class="count-num" id="today-count">0</span>
-      <span>questions added</span>
+    <div class="action-buttons-row">
+      <div class="action-col">
+        <div class="ripple-container" id="ripple-container"></div>
+        <button class="add-question-btn" id="add-btn" onclick="addQuestion()">
+          <div class="btn-plus">+</div>
+          <div class="btn-label">Add Question</div>
+        </button>
+        <div class="today-count-display">
+          <span>Today:</span>
+          <span class="count-num" id="today-count">0</span>
+          <span>questions</span>
+        </div>
+      </div>
+      <div class="action-col">
+        <button class="add-pushup-btn" id="pushup-btn" onclick="addPushups()">
+          <div class="pushup-icon">💪</div>
+          <div class="pushup-num">+10</div>
+          <div class="btn-label">Push-ups</div>
+        </button>
+        <div class="today-count-display">
+          <span>Today:</span>
+          <span class="count-num" id="today-pushup-count">0</span>
+          <span>push-ups</span>
+        </div>
+      </div>
     </div>
-    <div class="action-hint">Each question earns +<span id="xp-per-q">10</span> XP · Keep building!</div>
+    <div class="action-hint">Questions earn +<span id="xp-per-q">10</span> XP · Push-ups earn +5 XP per set · Keep grinding!</div>
   </div>
 
   <!-- STATS TABS -->
@@ -1683,6 +1778,8 @@ const LEVEL_CONFIG = [
 ];
 
 const XP_BASE = 10; // base XP per question
+const PUSHUP_XP = 5; // XP per set of 10 push-ups
+const PUSHUPS_PER_SET = 10;
 
 const TASK_IMPORTANCE_MIN = 5;
 const TASK_IMPORTANCE_MAX = 10;
@@ -1734,18 +1831,31 @@ const ACHIEVEMENTS_DEF = [
   { id: "loot_hunter",       icon: "🧰", name: "Loot Hunter",       desc: "Collect 10 inventory items",               threshold: 10,   stat: "items"     },
   { id: "arena_winner",      icon: "⚔️", name: "Arena Winner",      desc: "Win 3 mini-game battles",                  threshold: 3,    stat: "wins"      },
   { id: "arena_champion",    icon: "🛡️", name: "Arena Champion",    desc: "Win 15 mini-game battles",                 threshold: 15,   stat: "wins"      },
+  { id: "first_pushups",     icon: "💪", name: "First Set",         desc: "Do your first set of push-ups",            threshold: 10,   stat: "pushups"   },
+  { id: "pushups_100",       icon: "🔥", name: "Push-up Warrior",   desc: "Complete 100 total push-ups",              threshold: 100,  stat: "pushups"   },
+  { id: "pushups_500",       icon: "⚡", name: "Push-up Machine",   desc: "Complete 500 total push-ups",              threshold: 500,  stat: "pushups"   },
+  { id: "pushups_1000",      icon: "🏋️", name: "Iron Arms",         desc: "Complete 1,000 total push-ups",            threshold: 1000, stat: "pushups"   },
+  { id: "pushups_5000",      icon: "🦾", name: "Steel Body",        desc: "Complete 5,000 total push-ups",            threshold: 5000, stat: "pushups"   },
+  { id: "pushups_daily_50",  icon: "💥", name: "Daily Grinder",     desc: "Do 50 push-ups in a single day",           threshold: 50,   stat: "pushups_today" },
+  { id: "pushups_daily_100", icon: "🌋", name: "Century Set",       desc: "Do 100 push-ups in a single day",          threshold: 100,  stat: "pushups_today" },
+  { id: "pushups_daily_200", icon: "👑", name: "Push-up King",      desc: "Do 200 push-ups in a single day",          threshold: 200,  stat: "pushups_today" },
 ];
 
 /* ─────────────────────────────────────────────
    MILESTONE DEFINITIONS
    ───────────────────────────────────────────── */
 const MILESTONES = [
-  { id: "m10",  label: "10 Questions",    target: 10  },
-  { id: "m25",  label: "25 Questions",    target: 25  },
-  { id: "m50",  label: "50 Questions",    target: 50  },
-  { id: "m100", label: "100 Questions",   target: 100 },
-  { id: "m250", label: "250 Questions",   target: 250 },
-  { id: "m500", label: "500 Questions",   target: 500 },
+  { id: "m10",  label: "10 Questions",    target: 10,   stat: "questions" },
+  { id: "m25",  label: "25 Questions",    target: 25,   stat: "questions" },
+  { id: "m50",  label: "50 Questions",    target: 50,   stat: "questions" },
+  { id: "m100", label: "100 Questions",   target: 100,  stat: "questions" },
+  { id: "m250", label: "250 Questions",   target: 250,  stat: "questions" },
+  { id: "m500", label: "500 Questions",   target: 500,  stat: "questions" },
+  { id: "p100",  label: "100 Push-ups",   target: 100,  stat: "pushups" },
+  { id: "p500",  label: "500 Push-ups",   target: 500,  stat: "pushups" },
+  { id: "p1000", label: "1,000 Push-ups", target: 1000, stat: "pushups" },
+  { id: "p2500", label: "2,500 Push-ups", target: 2500, stat: "pushups" },
+  { id: "p5000", label: "5,000 Push-ups", target: 5000, stat: "pushups" },
 ];
 
 /* ─────────────────────────────────────────────
@@ -1858,6 +1968,11 @@ function getBaseEquipment() {
 }
 
 function ensureRpgDefaults(data) {
+  data.totalPushups = Number(data.totalPushups || 0);
+  data.dailyPushupCounts = data.dailyPushupCounts || {};
+  data.weeklyPushupCounts = data.weeklyPushupCounts || {};
+  data.monthlyPushupCounts = data.monthlyPushupCounts || {};
+  data.yearlyPushupCounts = data.yearlyPushupCounts || {};
   data.todoTasks = Array.isArray(data.todoTasks) ? data.todoTasks : [];
   data.completedTasks = Number(data.completedTasks || 0);
   data.inventory = Array.isArray(data.inventory) ? data.inventory : [];
@@ -1960,6 +2075,7 @@ function mergeUserRecords(serverData = {}, localData = {}) {
   const merged = {
     totalXP: Math.max(Number(serverData.totalXP || 0), Number(localData.totalXP || 0)),
     totalQuestions: Math.max(Number(serverData.totalQuestions || 0), Number(localData.totalQuestions || 0)),
+    totalPushups: Math.max(Number(serverData.totalPushups || 0), Number(localData.totalPushups || 0)),
     streak: Math.max(Number(serverData.streak || 0), Number(localData.streak || 0)),
     longestStreak: Math.max(Number(serverData.longestStreak || 0), Number(localData.longestStreak || 0)),
     completedTasks: Math.max(Number(serverData.completedTasks || 0), Number(localData.completedTasks || 0)),
@@ -1970,6 +2086,10 @@ function mergeUserRecords(serverData = {}, localData = {}) {
     weeklyCounts: mergeCountMaps(serverData.weeklyCounts, localData.weeklyCounts),
     monthlyCounts: mergeCountMaps(serverData.monthlyCounts, localData.monthlyCounts),
     yearlyCounts: mergeCountMaps(serverData.yearlyCounts, localData.yearlyCounts),
+    dailyPushupCounts: mergeCountMaps(serverData.dailyPushupCounts, localData.dailyPushupCounts),
+    weeklyPushupCounts: mergeCountMaps(serverData.weeklyPushupCounts, localData.weeklyPushupCounts),
+    monthlyPushupCounts: mergeCountMaps(serverData.monthlyPushupCounts, localData.monthlyPushupCounts),
+    yearlyPushupCounts: mergeCountMaps(serverData.yearlyPushupCounts, localData.yearlyPushupCounts),
     achievements: { ...(serverData.achievements || {}), ...(localData.achievements || {}) },
     recentLog: mergeRecentLog(serverData.recentLog, localData.recentLog),
     todoTasks: mergeTaskLists(serverData.todoTasks, localData.todoTasks),
@@ -2067,6 +2187,7 @@ async function loadUserData(uid) {
     const fresh = {
       totalXP:        0,
       totalQuestions: 0,
+      totalPushups:   0,
       streak:         0,
       lastActiveDate: null,
       longestStreak:  0,
@@ -2074,6 +2195,10 @@ async function loadUserData(uid) {
       weeklyCounts:   {},
       monthlyCounts:  {},
       yearlyCounts:   {},
+      dailyPushupCounts:   {},
+      weeklyPushupCounts:  {},
+      monthlyPushupCounts: {},
+      yearlyPushupCounts:  {},
       achievements:   {},
       recentLog:      [],
       todoTasks:      [],
@@ -2194,6 +2319,8 @@ function checkAchievementsForData(data) {
     tasks:  data.completedTasks || 0,
     items:  (data.inventory || []).length + EQUIPMENT_SLOTS.filter((slot) => !!data.equipment[slot]).length,
     wins:   (data.miniGame && data.miniGame.wins) || 0,
+    pushups: data.totalPushups || 0,
+    pushups_today: (data.dailyPushupCounts && data.dailyPushupCounts[today]) || 0,
   };
 
   for (const ach of ACHIEVEMENTS_DEF) {
@@ -2302,6 +2429,80 @@ async function addQuestion() {
   renderAll();
 
   setTimeout(() => { isAdding = false; }, 300);
+}
+
+/* ─────────────────────────────────────────────
+   CORE: ADD PUSH-UPS (+10)
+   ───────────────────────────────────────────── */
+
+let isPushupAdding = false;
+
+async function addPushups() {
+  if (!currentUser || !userData || isPushupAdding) return;
+  isPushupAdding = true;
+
+  const btn = document.getElementById('pushup-btn');
+  btn.classList.add('animate');
+  setTimeout(() => btn.classList.remove('animate'), 400);
+
+  let xpGained = 0;
+  let prevLevel = 0;
+  let newLevel = 0;
+  let newBadges = [];
+  try {
+    const result = await runUserTransaction((data) => {
+      const today = getDateKey();
+      const weekKey = getWeekKey();
+      const monthKey = getMonthKey();
+      const yearKey = getYearKey();
+
+      data.totalPushups = (data.totalPushups || 0) + PUSHUPS_PER_SET;
+      data.dailyPushupCounts = data.dailyPushupCounts || {};
+      data.weeklyPushupCounts = data.weeklyPushupCounts || {};
+      data.monthlyPushupCounts = data.monthlyPushupCounts || {};
+      data.yearlyPushupCounts = data.yearlyPushupCounts || {};
+      data.dailyPushupCounts[today] = (data.dailyPushupCounts[today] || 0) + PUSHUPS_PER_SET;
+      data.weeklyPushupCounts[weekKey] = (data.weeklyPushupCounts[weekKey] || 0) + PUSHUPS_PER_SET;
+      data.monthlyPushupCounts[monthKey] = (data.monthlyPushupCounts[monthKey] || 0) + PUSHUPS_PER_SET;
+      data.yearlyPushupCounts[yearKey] = (data.yearlyPushupCounts[yearKey] || 0) + PUSHUPS_PER_SET;
+
+      let gained = PUSHUP_XP;
+      if (data.dailyPushupCounts[today] % 50 === 0) gained *= 2;
+      if (data.dailyPushupCounts[today] % 100 === 0) gained *= 3;
+
+      const previousLevel = getLevelInfo(data.totalXP || 0).level;
+      data.totalXP = (data.totalXP || 0) + gained;
+      const currentLevel = getLevelInfo(data.totalXP || 0).level;
+
+      updateStreakForData(data);
+      addLogEntryToData(data, `Did ${PUSHUPS_PER_SET} push-ups (total: ${data.totalPushups})`, gained);
+      const badges = checkAchievementsForData(data);
+      return { gained, previousLevel, currentLevel, badges };
+    });
+    xpGained = result.gained;
+    prevLevel = result.previousLevel;
+    newLevel = result.currentLevel;
+    newBadges = result.badges;
+  } catch (e) {
+    console.error("Save error:", e);
+    isPushupAdding = false;
+    return;
+  }
+
+  showXpPopup(xpGained, btn);
+
+  if (newLevel > prevLevel) {
+    const levelInfo = getLevelInfo(userData.totalXP || 0);
+    setTimeout(() => showLevelUpToast(newLevel, levelInfo.title), 600);
+    launchConfetti();
+  }
+
+  if (newBadges.length > 0 && newLevel === prevLevel) {
+    setTimeout(() => showBadgeToast(newBadges[0]), 600);
+  }
+
+  renderAll();
+  setTimeout(() => { isPushupAdding = false; }, 300);
 }
 
 async function addTask() {
@@ -2623,6 +2824,7 @@ function renderAll() {
   renderLevelCard();
   renderStreakCard();
   renderTodayCount();
+  renderTodayPushupCount();
   renderStats();
   renderChart();
   renderMilestones();
@@ -2665,11 +2867,12 @@ function renderStreakCard() {
     const d    = new Date(Date.now() - i * 86400000);
     const key  = getDateKey(d);
     const count= userData.dailyCounts[key] || 0;
+    const pushups = (userData.dailyPushupCounts && userData.dailyPushupCounts[key]) || 0;
     const dot  = document.createElement('div');
     dot.className = 'streak-day-dot';
-    dot.title = `${key}: ${count} questions`;
+    dot.title = `${key}: ${count} questions, ${pushups} push-ups`;
     if (key === today)   { dot.classList.add('today');  dot.textContent = '★'; }
-    else if (count > 0)  { dot.classList.add('active');  dot.textContent = '✓'; }
+    else if (count > 0 || pushups > 0)  { dot.classList.add('active');  dot.textContent = '✓'; }
     else                 { dot.textContent = '·'; }
     container.appendChild(dot);
   }
@@ -2683,6 +2886,12 @@ function renderTodayCount() {
   const today = getDateKey();
   document.getElementById('today-count').textContent =
     userData.dailyCounts[today] || 0;
+}
+
+function renderTodayPushupCount() {
+  const today = getDateKey();
+  const el = document.getElementById('today-pushup-count');
+  if (el) el.textContent = (userData.dailyPushupCounts && userData.dailyPushupCounts[today]) || 0;
 }
 
 /* ─────────────────────────────────────────────
@@ -2702,45 +2911,51 @@ function renderStats() {
 
   if (activeTab === 'daily') {
     const todayCount = userData.dailyCounts[today] || 0;
-    // Best day ever
+    const todayPushups = (userData.dailyPushupCounts && userData.dailyPushupCounts[today]) || 0;
     const bestDay = Math.max(...Object.values(userData.dailyCounts || {}).map(v => Number(v)), 0);
+    const bestPushupDay = Math.max(...Object.values(userData.dailyPushupCounts || {}).map(v => Number(v)), 0);
     cards = [
-      { icon: '📝', label: 'Today',         value: todayCount },
-      { icon: '⭐', label: 'Best Day',       value: bestDay },
-      { icon: '🔥', label: 'Streak',         value: userData.streak || 0 },
-      { icon: '✨', label: 'XP Today',       value: todayCount * XP_BASE },
+      { icon: '📝', label: 'Questions Today', value: todayCount },
+      { icon: '💪', label: 'Push-ups Today',  value: todayPushups },
+      { icon: '⭐', label: 'Best Day (Q)',    value: bestDay },
+      { icon: '🔥', label: 'Best Day (PU)',   value: bestPushupDay },
+      { icon: '🔥', label: 'Streak',          value: userData.streak || 0 },
+      { icon: '✨', label: 'XP Today',        value: todayCount * XP_BASE + Math.floor(todayPushups / PUSHUPS_PER_SET) * PUSHUP_XP },
     ];
   } else if (activeTab === 'weekly') {
     const thisWeek = userData.weeklyCounts[weekKey] || 0;
+    const thisWeekPushups = (userData.weeklyPushupCounts && userData.weeklyPushupCounts[weekKey]) || 0;
     const allWeeks = Object.values(userData.weeklyCounts || {}).map(v => Number(v));
     const bestWeek = allWeeks.length ? Math.max(...allWeeks) : 0;
     const avgWeek  = allWeeks.length ? Math.round(allWeeks.reduce((a,b)=>a+b,0)/allWeeks.length) : 0;
     cards = [
-      { icon: '📅', label: 'This Week',      value: thisWeek },
-      { icon: '🏆', label: 'Best Week',      value: bestWeek },
-      { icon: '📊', label: 'Weekly Avg',     value: avgWeek },
-      { icon: '🔢', label: 'Total',          value: userData.totalQuestions || 0 },
+      { icon: '📅', label: 'Questions (Week)', value: thisWeek },
+      { icon: '💪', label: 'Push-ups (Week)',  value: thisWeekPushups },
+      { icon: '🏆', label: 'Best Week (Q)',    value: bestWeek },
+      { icon: '🔢', label: 'Total Push-ups',   value: userData.totalPushups || 0 },
     ];
   } else if (activeTab === 'monthly') {
     const thisMonth = userData.monthlyCounts[monthKey] || 0;
+    const thisMonthPushups = (userData.monthlyPushupCounts && userData.monthlyPushupCounts[monthKey]) || 0;
     const allMonths = Object.values(userData.monthlyCounts || {}).map(v => Number(v));
     const bestMonth = allMonths.length ? Math.max(...allMonths) : 0;
     const avgMonth  = allMonths.length ? Math.round(allMonths.reduce((a,b)=>a+b,0)/allMonths.length) : 0;
     cards = [
-      { icon: '🗓️', label: 'This Month',    value: thisMonth },
-      { icon: '🥇', label: 'Best Month',    value: bestMonth },
-      { icon: '📈', label: 'Monthly Avg',   value: avgMonth },
-      { icon: '🎯', label: 'Months Active', value: allMonths.length },
+      { icon: '🗓️', label: 'Questions (Month)', value: thisMonth },
+      { icon: '💪', label: 'Push-ups (Month)',   value: thisMonthPushups },
+      { icon: '🥇', label: 'Best Month (Q)',     value: bestMonth },
+      { icon: '🎯', label: 'Months Active',      value: allMonths.length },
     ];
   } else if (activeTab === 'yearly') {
     const thisYear  = userData.yearlyCounts[yearKey] || 0;
+    const thisYearPushups = (userData.yearlyPushupCounts && userData.yearlyPushupCounts[yearKey]) || 0;
     const allYears  = Object.values(userData.yearlyCounts || {}).map(v => Number(v));
     const bestYear  = allYears.length ? Math.max(...allYears) : 0;
     cards = [
-      { icon: '🌍', label: 'This Year',     value: thisYear },
-      { icon: '👑', label: 'Best Year',     value: bestYear },
-      { icon: '💎', label: 'Total XP',      value: userData.totalXP || 0 },
-      { icon: '📜', label: 'All Questions', value: userData.totalQuestions || 0 },
+      { icon: '🌍', label: 'Questions (Year)',  value: thisYear },
+      { icon: '💪', label: 'Push-ups (Year)',   value: thisYearPushups },
+      { icon: '💎', label: 'Total XP',          value: userData.totalXP || 0 },
+      { icon: '📜', label: 'Total Push-ups',    value: userData.totalPushups || 0 },
     ];
   }
 
@@ -2837,9 +3052,9 @@ function renderChart() {
 function renderMilestones() {
   const list = document.getElementById('milestone-list');
   list.innerHTML = '';
-  const total = userData.totalQuestions || 0;
 
   for (const ms of MILESTONES) {
+    const total = ms.stat === 'pushups' ? (userData.totalPushups || 0) : (userData.totalQuestions || 0);
     const progress  = Math.min(total, ms.target);
     const pct       = (progress / ms.target) * 100;
     const completed = total >= ms.target;
@@ -2879,6 +3094,8 @@ function renderAchievements() {
     tasks:  userData.completedTasks || 0,
     items:  (userData.inventory || []).length + EQUIPMENT_SLOTS.filter((slot) => !!userData.equipment[slot]).length,
     wins:   (userData.miniGame && userData.miniGame.wins) || 0,
+    pushups: userData.totalPushups || 0,
+    pushups_today: (userData.dailyPushupCounts && userData.dailyPushupCounts[today]) || 0,
   };
 
   for (const ach of ACHIEVEMENTS_DEF) {
@@ -3043,9 +3260,10 @@ auth.onAuthStateChanged(async (user) => {
     } catch (e) {
       console.error("Failed to load data:", e);
       userData = {
-        totalXP: 0, totalQuestions: 0, streak: 0,
+        totalXP: 0, totalQuestions: 0, totalPushups: 0, streak: 0,
         lastActiveDate: null, longestStreak: 0,
         dailyCounts: {}, weeklyCounts: {}, monthlyCounts: {}, yearlyCounts: {},
+        dailyPushupCounts: {}, weeklyPushupCounts: {}, monthlyPushupCounts: {}, yearlyPushupCounts: {},
         achievements: {}, recentLog: [],
         todoTasks: [], completedTasks: 0, inventory: [],
         equipment: getBaseEquipment(), skills: rollSkills(3),
