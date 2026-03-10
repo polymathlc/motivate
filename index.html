@@ -1359,6 +1359,23 @@
       gap: 12px;
     }
 
+    .hero-preview {
+      margin-top: 12px;
+      background: linear-gradient(180deg, rgba(20,32,58,0.95), rgba(8,14,28,0.95));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      text-align: center;
+    }
+
+    .hero-preview img {
+      width: 72px;
+      height: 72px;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 0 10px rgba(0,229,255,0.25));
+      animation: floaty 2.2s ease-in-out infinite;
+    }
+
     .slot-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -1385,6 +1402,16 @@
     .slot-item {
       color: var(--text-primary);
       font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .item-icon {
+      width: 20px;
+      height: 20px;
+      image-rendering: pixelated;
+      flex-shrink: 0;
     }
 
     .slot-empty {
@@ -1410,6 +1437,12 @@
       grid-template-columns: 1fr auto;
       align-items: center;
       gap: 10px;
+    }
+
+    .inventory-item-main {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .skills-row {
@@ -1462,6 +1495,147 @@
       min-height: 42px;
       color: var(--text-secondary);
       font-size: 13px;
+    }
+
+    .battle-stage {
+      margin-top: 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #1b2f4f 0%, #101c33 56%, #0b1325 100%);
+      min-height: 190px;
+      position: relative;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    .battle-lane {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 100%;
+      align-items: end;
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .fighter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-height: 160px;
+      justify-content: end;
+      transition: transform 0.2s ease;
+    }
+
+    .fighter img {
+      width: 88px;
+      height: 88px;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 6px 14px rgba(0,0,0,0.42));
+    }
+
+    .fighter.player.attacking { animation: dashAttack 0.38s ease; }
+    .fighter.enemy.attacking  { animation: dashAttackEnemy 0.38s ease; }
+    .fighter.hit img          { animation: hitShake 0.36s ease; }
+
+    .fighter-name {
+      font-size: 12px;
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .hp-track {
+      width: 120px;
+      height: 8px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .hp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ef4444, #f97316);
+      transition: width 0.3s ease;
+    }
+
+    .battle-projectile {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(0,229,255,0.8);
+      background: radial-gradient(circle at 35% 35%, #dfffff, #00e5ff 55%, #1f4a95 100%);
+      top: 50%;
+      left: 22%;
+      opacity: 0;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .battle-projectile.launch { animation: projectileFly 0.4s linear; }
+
+    .timing-wrap {
+      margin-top: 10px;
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px;
+    }
+
+    .timing-meter {
+      position: relative;
+      height: 14px;
+      background: linear-gradient(90deg, #5a1515 0%, #d97706 30%, #16a34a 50%, #d97706 70%, #5a1515 100%);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .timing-cursor {
+      position: absolute;
+      top: -3px;
+      width: 4px;
+      height: 20px;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(255,255,255,0.8);
+    }
+
+    .timing-status {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    @keyframes dashAttack {
+      0% { transform: translateX(0); }
+      45% { transform: translateX(14px); }
+      100% { transform: translateX(0); }
+    }
+
+    @keyframes dashAttackEnemy {
+      0% { transform: translateX(0); }
+      45% { transform: translateX(-14px); }
+      100% { transform: translateX(0); }
+    }
+
+    @keyframes hitShake {
+      0%, 100% { transform: translateX(0); filter: brightness(1); }
+      25% { transform: translateX(-5px); filter: brightness(1.5); }
+      75% { transform: translateX(5px); filter: brightness(1.4); }
+    }
+
+    @keyframes projectileFly {
+      0% { left: 22%; opacity: 0.1; }
+      8% { opacity: 1; }
+      100% { left: 74%; opacity: 0; }
     }
 
     @media (max-width: 900px) {
@@ -1702,6 +1876,10 @@
     <div class="rpg-grid">
       <div class="rpg-card">
         <div><strong>Equipment Slots</strong> (Diablo style)</div>
+        <div class="hero-preview">
+          <img id="hero-preview-sprite" alt="hero sprite" src="" />
+          <div class="slot-empty">Hero sprite from 0x72 DungeonTileset II</div>
+        </div>
         <div class="slot-grid" id="slot-grid"></div>
       </div>
       <div class="rpg-card">
@@ -1722,10 +1900,30 @@
     <div class="battle-card">
       <div>Fight a random foe using your skills and gear. Victories grant XP and items.</div>
       <div class="battle-stats" id="battle-stats"></div>
+      <div class="battle-stage" id="battle-stage">
+        <div class="battle-projectile" id="battle-projectile"></div>
+        <div class="battle-lane">
+          <div class="fighter player" id="fighter-player">
+            <img id="player-battle-sprite" alt="player" src="" />
+            <div class="fighter-name">Hero</div>
+            <div class="hp-track"><div class="hp-fill" id="player-hp-fill" style="width:100%"></div></div>
+          </div>
+          <div class="fighter enemy" id="fighter-enemy">
+            <img id="enemy-battle-sprite" alt="enemy" src="" />
+            <div class="fighter-name" id="enemy-battle-name">Enemy</div>
+            <div class="hp-track"><div class="hp-fill" id="enemy-hp-fill" style="width:100%"></div></div>
+          </div>
+        </div>
+      </div>
       <div class="battle-controls">
         <button class="quest-btn" onclick="startBattle()">Start Battle</button>
         <button class="quest-btn" onclick="battleAttack()">Attack</button>
         <button class="quest-btn warn" onclick="battleSkill()">Use Skill</button>
+        <button class="quest-btn" id="timing-btn" onclick="timingStrike()">Timing Strike</button>
+      </div>
+      <div class="timing-wrap">
+        <div class="timing-meter"><div class="timing-cursor" id="timing-cursor" style="left:0%"></div></div>
+        <div class="timing-status" id="timing-status">Timing Strike: press once to start, press again near center for bonus damage.</div>
       </div>
       <div class="battle-log" id="battle-log">No battle yet. Start one to enter the arena.</div>
     </div>
@@ -1806,6 +2004,33 @@ const ITEM_TEMPLATES = [
   { slot: 'amulet', names: ['Sun Amulet', 'Void Pendant'],               atk: [1, 4], def: [1, 3] },
 ];
 
+// Sprites sourced from 0x72 Dungeontileset II (public GitHub repository).
+const SPRITE_SOURCES = {
+  hero: {
+    idle: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/knight_f_idle_anim_f0.png',
+    attack: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/knight_f_attack_anim_f0.png',
+    hit: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/knight_f_hit_anim_f0.png',
+  },
+  enemies: {
+    'Blood Wraith': 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/wizzard_m_idle_anim_f0.png',
+    'Ash Reaver': 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/necromancer_idle_anim_f0.png',
+    'Crypt Fiend': 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/big_demon_idle_anim_f0.png',
+    'Storm Ghoul': 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/chort_idle_anim_f0.png',
+  },
+  items: {
+    helm: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/helmet_iron.png',
+    chest: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/armor_iron.png',
+    gloves: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/gloves.png',
+    pants: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/pants_1.png',
+    boots: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/boots_armor.png',
+    weapon: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/greatsword_1.png',
+    offhand: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/shield_1.png',
+    ring1: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/ring_gold.png',
+    ring2: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/ring_gold_red.png',
+    amulet: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/necklace.png',
+  },
+};
+
 const EQUIPMENT_SLOTS = ['helm', 'chest', 'gloves', 'pants', 'boots', 'weapon', 'offhand', 'ring1', 'ring2', 'amulet'];
 
 /* ─────────────────────────────────────────────
@@ -1866,6 +2091,7 @@ let userData    = null;        // live Firestore doc data
 let activeTab   = 'daily';
 let isAdding    = false;       // debounce flag
 let userDocUnsubscribe = null;
+let timingState = { active: false, pos: 0, dir: 1, rafId: null, startedAt: 0 };
 
 /* ─────────────────────────────────────────────
    UTILITY HELPERS
@@ -1960,6 +2186,99 @@ function createRandomItem() {
   };
 }
 
+function getItemSprite(slot) {
+  return SPRITE_SOURCES.items[slot] || SPRITE_SOURCES.items.weapon;
+}
+
+function getEnemySprite(enemyName) {
+  return SPRITE_SOURCES.enemies[enemyName] || SPRITE_SOURCES.enemies['Crypt Fiend'];
+}
+
+function pulseSprite(action = 'attack') {
+  const player = document.getElementById('fighter-player');
+  const enemy = document.getElementById('fighter-enemy');
+  const projectile = document.getElementById('battle-projectile');
+  const playerImg = document.getElementById('player-battle-sprite');
+
+  if (!player || !enemy || !projectile || !playerImg) return;
+  if (action === 'attack') {
+    player.classList.remove('attacking');
+    enemy.classList.remove('hit');
+    void player.offsetWidth;
+    player.classList.add('attacking');
+    projectile.classList.remove('launch');
+    void projectile.offsetWidth;
+    projectile.classList.add('launch');
+    playerImg.src = SPRITE_SOURCES.hero.attack;
+    setTimeout(() => {
+      enemy.classList.add('hit');
+      playerImg.src = SPRITE_SOURCES.hero.idle;
+    }, 210);
+    setTimeout(() => {
+      enemy.classList.remove('hit');
+    }, 420);
+  } else {
+    enemy.classList.remove('attacking');
+    player.classList.remove('hit');
+    void enemy.offsetWidth;
+    enemy.classList.add('attacking');
+    setTimeout(() => player.classList.add('hit'), 170);
+    setTimeout(() => player.classList.remove('hit'), 430);
+  }
+}
+
+function setTimingStatus(msg) {
+  const status = document.getElementById('timing-status');
+  if (status) status.textContent = msg;
+}
+
+function stopTimingLoop() {
+  if (timingState.rafId) cancelAnimationFrame(timingState.rafId);
+  timingState.rafId = null;
+  timingState.active = false;
+}
+
+function startTimingLoop() {
+  const cursor = document.getElementById('timing-cursor');
+  if (!cursor) return;
+  timingState = { active: true, pos: 0, dir: 1, rafId: null, startedAt: performance.now() };
+  const speed = 0.11;
+  let lastTs = performance.now();
+  const tick = (ts) => {
+    if (!timingState.active) return;
+    const delta = ts - lastTs;
+    lastTs = ts;
+    timingState.pos += timingState.dir * delta * speed;
+    if (timingState.pos >= 100) {
+      timingState.pos = 100;
+      timingState.dir = -1;
+    } else if (timingState.pos <= 0) {
+      timingState.pos = 0;
+      timingState.dir = 1;
+    }
+    cursor.style.left = `${timingState.pos}%`;
+    timingState.rafId = requestAnimationFrame(tick);
+  };
+  timingState.rafId = requestAnimationFrame(tick);
+}
+
+async function timingStrike() {
+  if (!userData || !userData.miniGame || !userData.miniGame.inBattle) {
+    setTimingStatus('Start a battle before using Timing Strike.');
+    return;
+  }
+  if (!timingState.active) {
+    startTimingLoop();
+    setTimingStatus('Stop the cursor near center (50%) for a crit multiplier!');
+    return;
+  }
+  stopTimingLoop();
+  const centerDiff = Math.abs(50 - timingState.pos);
+  const bonus = Math.max(1, 2.2 - (centerDiff / 50) * 1.2);
+  setTimingStatus(`Locked at ${timingState.pos.toFixed(0)}% · x${bonus.toFixed(2)} damage bonus`);
+  await resolveBattleTurn(false, bonus);
+}
+
 function getBaseEquipment() {
   return EQUIPMENT_SLOTS.reduce((acc, slot) => {
     acc[slot] = null;
@@ -1990,6 +2309,7 @@ function ensureRpgDefaults(data) {
   data.miniGame.enemyMaxHp = Number(data.miniGame.enemyMaxHp || 0);
   data.miniGame.enemyPower = Number(data.miniGame.enemyPower || 0);
   data.miniGame.enemyName = data.miniGame.enemyName || '';
+  data.miniGame.enemySprite = data.miniGame.enemySprite || getEnemySprite(data.miniGame.enemyName);
   data.miniGame.log = data.miniGame.log || 'No battle yet. Start one to enter the arena.';
 }
 
@@ -2105,6 +2425,7 @@ function mergeUserRecords(serverData = {}, localData = {}) {
       enemyMaxHp: 0,
       enemyPower: 0,
       enemyName: '',
+      enemySprite: '',
       log: (localData.miniGame && localData.miniGame.log) || (serverData.miniGame && serverData.miniGame.log) || 'No battle yet. Start one to enter the arena.',
     },
   };
@@ -2215,6 +2536,7 @@ async function loadUserData(uid) {
         enemyMaxHp: 0,
         enemyPower: 0,
         enemyName: '',
+        enemySprite: '',
         log: 'No battle yet. Start one to enter the arena.',
       },
     };
@@ -2635,20 +2957,21 @@ async function startBattle() {
     data.miniGame.enemyHp = data.miniGame.enemyMaxHp;
     data.miniGame.enemyPower = 6 + enemyLevel * 2;
     data.miniGame.enemyName = sample(['Blood Wraith', 'Ash Reaver', 'Crypt Fiend', 'Storm Ghoul']);
+    data.miniGame.enemySprite = getEnemySprite(data.miniGame.enemyName);
     data.miniGame.log = `${data.miniGame.enemyName} appears with ${data.miniGame.enemyHp} HP.`;
   });
   renderMiniGame();
 }
 
 async function battleAttack() {
-  await resolveBattleTurn(false);
+  await resolveBattleTurn(false, 1);
 }
 
 async function battleSkill() {
-  await resolveBattleTurn(true);
+  await resolveBattleTurn(true, 1);
 }
 
-async function resolveBattleTurn(useSkill) {
+async function resolveBattleTurn(useSkill, extraMultiplier = 1) {
   if (!userData || !currentUser) return;
   const result = await runUserTransaction((data) => {
     if (!data.miniGame.inBattle) {
@@ -2664,8 +2987,10 @@ async function resolveBattleTurn(useSkill) {
       damage = Math.round(damage * Number(skill.power || 1.5));
       skillText = ` using ${skill.name}`;
     }
+    damage = Math.round(damage * Number(extraMultiplier || 1));
 
     data.miniGame.enemyHp = Math.max(0, data.miniGame.enemyHp - damage);
+    data.miniGame.enemySprite = getEnemySprite(data.miniGame.enemyName);
     if (data.miniGame.enemyHp <= 0) {
       const winXp = 25 + randomInt(0, 20);
       data.totalXP = (data.totalXP || 0) + winXp;
@@ -2695,6 +3020,10 @@ async function resolveBattleTurn(useSkill) {
   });
 
   renderAll();
+  pulseSprite('attack');
+  if (userData.miniGame.inBattle) {
+    setTimeout(() => pulseSprite('enemy'), 360);
+  }
   if (result.won && result.badges.length) showBadgeToast(result.badges[0]);
 }
 
@@ -3145,7 +3474,9 @@ function renderRpgPanel() {
   const slotGrid = document.getElementById('slot-grid');
   const skillsRow = document.getElementById('skills-row');
   const inventoryList = document.getElementById('inventory-list');
+  const heroPreviewSprite = document.getElementById('hero-preview-sprite');
   if (!slotGrid || !skillsRow || !inventoryList) return;
+  if (heroPreviewSprite) heroPreviewSprite.src = SPRITE_SOURCES.hero.idle;
 
   const prettySlot = {
     helm: 'Helm', chest: 'Chest', gloves: 'Gloves', pants: 'Pants', boots: 'Boots',
@@ -3160,7 +3491,7 @@ function renderRpgPanel() {
     el.innerHTML = `
       <div class="slot-name">${prettySlot[slot]}</div>
       ${item
-        ? `<div class="slot-item">${item.name}<br/>ATK +${item.atk} · DEF +${item.def}</div>
+        ? `<div class="slot-item"><img class="item-icon" src="${getItemSprite(item.slot)}" alt="${item.slot}" /> ${item.name}</div><div class="slot-empty">ATK +${item.atk} · DEF +${item.def}</div>
            <button class="quest-btn" style="margin-top:6px;padding:6px 8px;font-size:11px;" onclick="unequipSlot('${slot}')">Unequip</button>`
         : '<div class="slot-empty">Empty slot</div>'}
     `;
@@ -3185,7 +3516,7 @@ function renderRpgPanel() {
     const row = document.createElement('div');
     row.className = 'inventory-row';
     row.innerHTML = `
-      <div>${item.name} · ${item.slot}<br/><span class="slot-empty">${item.rarity} · ATK +${item.atk} · DEF +${item.def}</span></div>
+      <div class="inventory-item-main"><img class="item-icon" src="${getItemSprite(item.slot)}" alt="${item.slot}" /><div>${item.name} · ${item.slot}<br/><span class="slot-empty">${item.rarity} · ATK +${item.atk} · DEF +${item.def}</span></div></div>
       <button class="quest-btn" style="padding:6px 8px;font-size:11px;" onclick="equipItem('${item.id}')">Equip</button>
     `;
     inventoryList.appendChild(row);
@@ -3195,9 +3526,27 @@ function renderRpgPanel() {
 function renderMiniGame() {
   const battleStats = document.getElementById('battle-stats');
   const battleLog = document.getElementById('battle-log');
+  const playerBattleSprite = document.getElementById('player-battle-sprite');
+  const enemyBattleSprite = document.getElementById('enemy-battle-sprite');
+  const enemyBattleName = document.getElementById('enemy-battle-name');
+  const playerHpFill = document.getElementById('player-hp-fill');
+  const enemyHpFill = document.getElementById('enemy-hp-fill');
   if (!battleStats || !battleLog) return;
   const stats = getCharacterStats();
   const game = userData.miniGame;
+
+  if (playerBattleSprite) playerBattleSprite.src = SPRITE_SOURCES.hero.idle;
+  if (enemyBattleSprite) enemyBattleSprite.src = game.enemySprite || getEnemySprite(game.enemyName);
+  if (enemyBattleName) enemyBattleName.textContent = game.enemyName || 'Training Dummy';
+  if (playerHpFill) {
+    const maxPlayerHp = game.inBattle ? stats.maxHp : stats.maxHp;
+    playerHpFill.style.width = `${Math.max(0, Math.min(100, ((game.inBattle ? game.playerHp : stats.maxHp) / maxPlayerHp) * 100))}%`;
+  }
+  if (enemyHpFill) {
+    const enemyPct = game.enemyMaxHp ? (game.enemyHp / game.enemyMaxHp) * 100 : 0;
+    enemyHpFill.style.width = `${Math.max(0, Math.min(100, enemyPct))}%`;
+  }
+
   battleStats.innerHTML = `
     <div class="battle-stat">HP<br/><strong>${game.inBattle ? game.playerHp : stats.maxHp}</strong></div>
     <div class="battle-stat">ATK<br/><strong>${stats.atk}</strong></div>
@@ -3267,7 +3616,7 @@ auth.onAuthStateChanged(async (user) => {
         achievements: {}, recentLog: [],
         todoTasks: [], completedTasks: 0, inventory: [],
         equipment: getBaseEquipment(), skills: rollSkills(3),
-        miniGame: { wins: 0, plays: 0, inBattle: false, playerHp: 100, enemyHp: 0, enemyMaxHp: 0, enemyPower: 0, enemyName: '', log: 'No battle yet. Start one to enter the arena.' },
+        miniGame: { wins: 0, plays: 0, inBattle: false, playerHp: 100, enemyHp: 0, enemyMaxHp: 0, enemyPower: 0, enemyName: '', enemySprite: '', log: 'No battle yet. Start one to enter the arena.' },
       };
     }
 
