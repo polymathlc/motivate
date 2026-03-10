@@ -2004,32 +2004,235 @@ const ITEM_TEMPLATES = [
   { slot: 'amulet', names: ['Sun Amulet', 'Void Pendant'],               atk: [1, 4], def: [1, 3] },
 ];
 
-// Sprites sourced from 0x72 Dungeontileset II (public GitHub repository).
-const SPRITE_SOURCES = {
-  hero: {
-    idle: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/knight_f_idle_anim_f0.png',
-    attack: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/knight_f_attack_anim_f0.png',
-    hit: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/knight_f_hit_anim_f0.png',
-  },
-  enemies: {
-    'Blood Wraith': 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/wizzard_m_idle_anim_f0.png',
-    'Ash Reaver': 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/necromancer_idle_anim_f0.png',
-    'Crypt Fiend': 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/big_demon_idle_anim_f0.png',
-    'Storm Ghoul': 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/chort_idle_anim_f0.png',
-  },
-  items: {
-    helm: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/helmet_iron.png',
-    chest: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/armor_iron.png',
-    gloves: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/gloves.png',
-    pants: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/pants_1.png',
-    boots: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/boots_armor.png',
-    weapon: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/greatsword_1.png',
-    offhand: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/shield_1.png',
-    ring1: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/ring_gold.png',
-    ring2: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/ring_gold_red.png',
-    amulet: 'https://raw.githubusercontent.com/0x72/Dungeontileset-II/master/frames/necklace.png',
-  },
-};
+// Inline pixel-art sprite generator – no external dependencies.
+function _mkSprite(w, h, pixels) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  for (const [color, coords] of Object.entries(pixels)) {
+    ctx.fillStyle = color;
+    for (let i = 0; i < coords.length; i += 2) {
+      ctx.fillRect(coords[i], coords[i + 1], 1, 1);
+    }
+  }
+  return c.toDataURL();
+}
+
+const SPRITE_SOURCES = (function generateSprites() {
+  // ── Hero: Knight idle (16x16) ──
+  const heroIdle = _mkSprite(16, 16, {
+    '#888': [6,0,7,0,8,0,9,0, 6,1,9,1, 6,2,9,2],                                       // helmet top
+    '#aaa': [7,1,8,1, 7,2,8,2],                                                          // helmet face
+    '#ffcc99': [7,3,8,3],                                                                  // face
+    '#556': [6,3,9,3],                                                                     // helmet sides
+    '#4466aa': [6,4,7,4,8,4,9,4, 5,5,6,5,7,5,8,5,9,5,10,5, 6,6,7,6,8,6,9,6,            // armor
+                6,7,7,7,8,7,9,7, 6,8,7,8,8,8,9,8],
+    '#335588': [5,6,10,6, 5,7,10,7, 5,8,10,8],                                           // arms
+    '#774422': [6,9,7,9,8,9,9,9, 6,10,7,10,8,10,9,10],                                   // belt/pants
+    '#664411': [6,11,7,11,8,11,9,11, 6,12,9,12],                                         // legs
+    '#553300': [5,13,6,13, 9,13,10,13, 5,14,6,14, 9,14,10,14],                           // boots
+    '#999': [4,7,4,8,4,9, 3,10,3,11],                                                     // sword blade
+    '#cc9900': [4,6],                                                                      // sword hilt
+  });
+
+  // ── Hero: Knight attack (16x16) ──
+  const heroAttack = _mkSprite(16, 16, {
+    '#888': [6,0,7,0,8,0,9,0, 6,1,9,1, 6,2,9,2],
+    '#aaa': [7,1,8,1, 7,2,8,2],
+    '#ffcc99': [7,3,8,3],
+    '#556': [6,3,9,3],
+    '#4466aa': [6,4,7,4,8,4,9,4, 5,5,6,5,7,5,8,5,9,5,10,5, 6,6,7,6,8,6,9,6,
+                6,7,7,7,8,7,9,7, 6,8,7,8,8,8,9,8],
+    '#335588': [5,6,10,6, 11,5,12,5, 5,7,10,7, 5,8,10,8],                                // right arm extended
+    '#774422': [6,9,7,9,8,9,9,9, 6,10,7,10,8,10,9,10],
+    '#664411': [6,11,7,11,8,11,9,11, 6,12,9,12],
+    '#553300': [5,13,6,13, 9,13,10,13, 5,14,6,14, 9,14,10,14],
+    '#999': [13,4,14,4,15,4, 13,5],                                                       // sword extended right
+    '#cc9900': [12,4],
+  });
+
+  // ── Hero: Knight hit (16x16) ──
+  const heroHit = _mkSprite(16, 16, {
+    '#888': [7,0,8,0,9,0,10,0, 7,1,10,1, 7,2,10,2],                                     // shifted right (recoil)
+    '#aaa': [8,1,9,1, 8,2,9,2],
+    '#ffcc99': [8,3,9,3],
+    '#556': [7,3,10,3],
+    '#4466aa': [7,4,8,4,9,4,10,4, 7,5,8,5,9,5,10,5,11,5, 7,6,8,6,9,6,10,6,
+                7,7,8,7,9,7,10,7, 7,8,8,8,9,8,10,8],
+    '#335588': [6,5,6,6, 11,6,11,7, 6,7,6,8, 11,8],
+    '#774422': [7,9,8,9,9,9,10,9, 7,10,8,10,9,10,10,10],
+    '#664411': [7,11,8,11,9,11,10,11, 7,12,10,12],
+    '#553300': [6,13,7,13, 10,13,11,13, 6,14,7,14, 10,14,11,14],
+    '#ff4444': [5,4,5,5, 12,3,12,4, 4,6, 13,5],                                         // hit flash
+  });
+
+  // ── Enemy: Blood Wraith – wizard (16x16) ──
+  const bloodWraith = _mkSprite(16, 16, {
+    '#662266': [6,0,7,0,8,0,9,0, 5,1,6,1,9,1,10,1, 5,2,10,2],                           // hat
+    '#ffcc99': [7,2,8,2, 7,3,8,3],                                                        // face
+    '#ff3333': [6,3,9,3],                                                                  // eyes
+    '#551155': [6,4,7,4,8,4,9,4, 5,5,6,5,7,5,8,5,9,5,10,5, 5,6,6,6,7,6,8,6,9,6,10,6,
+                5,7,6,7,7,7,8,7,9,7,10,7, 6,8,7,8,8,8,9,8, 6,9,7,9,8,9,9,9,
+                5,10,6,10,9,10,10,10, 4,11,5,11,10,11,11,11],                             // robe
+    '#7733aa': [7,10,8,10, 7,11,8,11],                                                    // robe trim
+    '#cc9900': [3,5,3,6,3,7,3,8,3,9, 2,4,3,4],                                           // staff
+    '#ffaa00': [2,3,3,3],                                                                  // staff orb
+    '#553300': [6,12,7,12, 8,12,9,12, 6,13,9,13],                                        // feet
+  });
+
+  // ── Enemy: Ash Reaver – necromancer (16x16) ──
+  const ashReaver = _mkSprite(16, 16, {
+    '#333': [6,0,7,0,8,0,9,0, 5,1,6,1,9,1,10,1],                                        // hood
+    '#2a2a2a': [5,2,6,2,9,2,10,2],
+    '#aaffaa': [7,2,8,2],                                                                  // glowing face
+    '#00ff00': [7,3,8,3],                                                                  // eyes
+    '#222': [6,4,7,4,8,4,9,4, 5,5,6,5,7,5,8,5,9,5,10,5, 5,6,6,6,7,6,8,6,9,6,10,6,
+             5,7,6,7,7,7,8,7,9,7,10,7, 6,8,7,8,8,8,9,8,
+             5,9,6,9,7,9,8,9,9,9,10,9, 4,10,5,10,10,10,11,10,
+             3,11,4,11,11,11,12,11],                                                       // dark robe
+    '#115511': [7,10,8,10, 6,3,9,3],                                                       // rune glow
+    '#444': [6,12,7,12,8,12,9,12, 6,13,9,13],                                             // feet
+    '#55ff55': [12,5,13,5,13,6, 12,7,13,7],                                               // spell glow
+  });
+
+  // ── Enemy: Crypt Fiend – big demon (16x16) ──
+  const cryptFiend = _mkSprite(16, 16, {
+    '#cc2222': [4,0,5,0, 10,0,11,0, 4,1,5,1, 10,1,11,1],                                 // horns
+    '#aa1111': [5,2,6,2,7,2,8,2,9,2,10,2, 5,3,6,3,9,3,10,3],                             // head
+    '#ff6600': [7,3,8,3],                                                                  // eyes
+    '#881111': [5,4,6,4,7,4,8,4,9,4,10,4, 4,5,5,5,6,5,7,5,8,5,9,5,10,5,11,5,
+               4,6,5,6,6,6,7,6,8,6,9,6,10,6,11,6, 4,7,5,7,6,7,7,7,8,7,9,7,10,7,11,7,
+               5,8,6,8,7,8,8,8,9,8,10,8, 5,9,6,9,7,9,8,9,9,9,10,9],                     // body
+    '#660000': [3,5,3,6,3,7, 12,5,12,6,12,7],                                             // arms
+    '#992222': [5,10,6,10,7,10,8,10,9,10,10,10],                                          // waist
+    '#772222': [5,11,6,11, 9,11,10,11, 4,12,5,12,6,12, 9,12,10,12,11,12,
+               4,13,5,13, 10,13,11,13, 4,14,5,14, 10,14,11,14],                           // legs/hooves
+  });
+
+  // ── Enemy: Storm Ghoul – small demon (16x16) ──
+  const stormGhoul = _mkSprite(16, 16, {
+    '#5555cc': [5,2,6,2, 9,2,10,2],                                                       // horns
+    '#4444aa': [6,3,7,3,8,3,9,3, 6,4,7,4,8,4,9,4],                                       // head
+    '#ffff00': [7,4,8,4],                                                                  // eyes (override)
+    '#3333aa': [5,5,6,5,7,5,8,5,9,5,10,5, 5,6,6,6,7,6,8,6,9,6,10,6,
+                6,7,7,7,8,7,9,7, 6,8,7,8,8,8,9,8],                                       // body
+    '#2222aa': [4,6,4,7, 11,6,11,7],                                                      // arms
+    '#333388': [6,9,7,9,8,9,9,9],                                                         // waist
+    '#222266': [6,10,7,10, 8,10,9,10, 5,11,6,11, 9,11,10,11],                             // legs
+    '#7777ff': [4,5,3,5, 11,5,12,5, 3,4,12,4],                                            // lightning sparks
+  });
+
+  // ── Item: Helm (16x16) ──
+  const helm = _mkSprite(16, 16, {
+    '#888': [5,3,6,3,7,3,8,3,9,3,10,3, 4,4,5,4,10,4,11,4, 4,5,5,5,10,5,11,5,
+             4,6,5,6,10,6,11,6, 5,7,6,7,7,7,8,7,9,7,10,7,
+             5,8,6,8,9,8,10,8, 5,9,10,9],
+    '#aaa': [6,4,7,4,8,4,9,4, 6,5,7,5,8,5,9,5, 6,6,7,6,8,6,9,6],                       // visor
+    '#666': [7,7,8,7, 7,8,8,8],                                                            // face slit
+    '#999': [7,2,8,2],                                                                      // crest
+  });
+
+  // ── Item: Chest armor (16x16) ──
+  const chest = _mkSprite(16, 16, {
+    '#4466aa': [6,2,7,2,8,2,9,2, 5,3,6,3,7,3,8,3,9,3,10,3,
+                5,4,6,4,7,4,8,4,9,4,10,4, 5,5,6,5,7,5,8,5,9,5,10,5,
+                5,6,6,6,7,6,8,6,9,6,10,6, 6,7,7,7,8,7,9,7,
+                6,8,7,8,8,8,9,8, 6,9,7,9,8,9,9,9],
+    '#3355aa': [4,4,4,5,4,6, 11,4,11,5,11,6],                                             // shoulders
+    '#cc9900': [7,5,8,5],                                                                   // chest emblem
+    '#3344aa': [6,10,7,10,8,10,9,10],                                                      // bottom trim
+  });
+
+  // ── Item: Gloves (16x16) ──
+  const gloves = _mkSprite(16, 16, {
+    '#8B6914': [4,5,5,5,6,5, 4,6,5,6,6,6, 4,7,5,7,6,7, 5,8,6,8,
+                9,5,10,5,11,5, 9,6,10,6,11,6, 9,7,10,7,11,7, 9,8,10,8],                 // gloves
+    '#A07818': [4,4,5,4,6,4, 9,4,10,4,11,4],                                              // cuff
+    '#6B5010': [3,7,3,8, 7,7,7,8, 8,7,8,8, 12,7,12,8],                                   // fingers
+    '#888': [5,3,6,3, 9,3,10,3],                                                           // metal studs
+  });
+
+  // ── Item: Pants (16x16) ──
+  const pants = _mkSprite(16, 16, {
+    '#774422': [6,3,7,3,8,3,9,3, 5,4,6,4,7,4,8,4,9,4,10,4,
+                5,5,6,5,7,5,8,5,9,5,10,5, 6,6,7,6,8,6,9,6],                              // waist
+    '#664411': [6,7,7,7, 8,7,9,7, 6,8,7,8, 8,8,9,8,
+                5,9,6,9, 9,9,10,9, 5,10,6,10, 9,10,10,10,
+                5,11,6,11, 9,11,10,11],                                                   // legs
+    '#cc9900': [7,3,8,3],                                                                   // belt buckle
+  });
+
+  // ── Item: Boots (16x16) ──
+  const boots = _mkSprite(16, 16, {
+    '#553300': [5,5,6,5,7,5, 9,5,10,5,11,5, 5,6,6,6,7,6, 9,6,10,6,11,6,
+                5,7,6,7,7,7, 9,7,10,7,11,7, 4,8,5,8,6,8,7,8, 8,8,9,8,10,8,11,8],       // boots
+    '#442200': [4,9,5,9,6,9,7,9, 8,9,9,9,10,9,11,9,
+                4,10,5,10,6,10,7,10, 8,10,9,10,10,10,11,10],                              // soles
+    '#664422': [5,4,6,4, 10,4,11,4],                                                       // tops
+    '#888': [6,5,7,5, 10,5,11,5],                                                          // buckles
+  });
+
+  // ── Item: Weapon / greatsword (16x16) ──
+  const weapon = _mkSprite(16, 16, {
+    '#bbb': [7,1, 7,2,8,2, 7,3,8,3, 7,4,8,4, 7,5,8,5, 7,6,8,6, 7,7,8,7],              // blade
+    '#ddd': [8,1, 8,3, 8,5, 8,7],                                                         // blade shine
+    '#cc9900': [5,8,6,8,7,8,8,8,9,8,10,8],                                                // crossguard
+    '#8B6914': [7,9,8,9, 7,10,8,10, 7,11,8,11],                                           // grip
+    '#cc0000': [7,12,8,12],                                                                 // pommel gem
+  });
+
+  // ── Item: Offhand / shield (16x16) ──
+  const offhand = _mkSprite(16, 16, {
+    '#4466aa': [5,2,6,2,7,2,8,2,9,2,10,2, 4,3,5,3,6,3,7,3,8,3,9,3,10,3,11,3,
+                4,4,5,4,6,4,7,4,8,4,9,4,10,4,11,4,
+                4,5,5,5,6,5,7,5,8,5,9,5,10,5,11,5,
+                4,6,5,6,6,6,7,6,8,6,9,6,10,6,11,6,
+                5,7,6,7,7,7,8,7,9,7,10,7,
+                5,8,6,8,7,8,8,8,9,8,10,8,
+                6,9,7,9,8,9,9,9, 7,10,8,10],                                              // shield body
+    '#3355aa': [5,3,10,3, 4,4,11,4, 4,5,11,5, 4,6,11,6, 5,7,10,7],                       // rim
+    '#cc9900': [7,5,8,5, 7,6,8,6],                                                         // emblem
+  });
+
+  // ── Item: Ring 1 – gold (16x16) ──
+  const ring1 = _mkSprite(16, 16, {
+    '#cc9900': [6,4,7,4,8,4,9,4, 5,5,10,5, 5,6,10,6, 5,7,10,7,
+                6,8,7,8,8,8,9,8],                                                         // gold ring
+    '#ffcc00': [6,4,7,4,8,4, 5,5,5,6],                                                    // highlight
+    '#aa7700': [9,4, 10,5,10,6,10,7, 7,8,8,8,9,8],                                        // shadow
+  });
+
+  // ── Item: Ring 2 – gold with red gem (16x16) ──
+  const ring2 = _mkSprite(16, 16, {
+    '#cc9900': [6,5,7,5,8,5,9,5, 5,6,10,6, 5,7,10,7, 5,8,10,8,
+                6,9,7,9,8,9,9,9],                                                         // gold ring
+    '#ffcc00': [6,5,7,5,8,5, 5,6,5,7],
+    '#aa7700': [9,5, 10,6,10,7,10,8, 7,9,8,9,9,9],
+    '#cc0000': [7,3,8,3, 7,4,8,4],                                                        // red gem
+    '#ff3333': [7,3],                                                                       // gem shine
+  });
+
+  // ── Item: Amulet / pendant (16x16) ──
+  const amulet = _mkSprite(16, 16, {
+    '#cc9900': [6,2,7,2,8,2,9,2, 5,3,10,3, 5,4,10,4, 6,5,9,5],                           // chain
+    '#ffcc00': [7,2,8,2],                                                                   // chain highlight
+    '#4466aa': [7,6,8,6, 6,7,7,7,8,7,9,7, 6,8,7,8,8,8,9,8, 7,9,8,9],                    // pendant
+    '#5588cc': [7,7,8,7],                                                                   // gem shine
+  });
+
+  return {
+    hero: { idle: heroIdle, attack: heroAttack, hit: heroHit },
+    enemies: {
+      'Blood Wraith': bloodWraith,
+      'Ash Reaver': ashReaver,
+      'Crypt Fiend': cryptFiend,
+      'Storm Ghoul': stormGhoul,
+    },
+    items: {
+      helm, chest, gloves, pants, boots, weapon, offhand, ring1, ring2, amulet,
+    },
+  };
+})();
 
 const EQUIPMENT_SLOTS = ['helm', 'chest', 'gloves', 'pants', 'boots', 'weapon', 'offhand', 'ring1', 'ring2', 'amulet'];
 
