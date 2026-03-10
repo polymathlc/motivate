@@ -2619,18 +2619,24 @@ function mergeUserRecords(serverData = {}, localData = {}) {
     inventory: mergeInventory(serverData.inventory, localData.inventory),
     equipment: getBaseEquipment(),
     skills: (localData.skills && localData.skills.length) ? localData.skills : ((serverData.skills && serverData.skills.length) ? serverData.skills : rollSkills(3)),
-    miniGame: {
-      wins: Math.max(Number((serverData.miniGame && serverData.miniGame.wins) || 0), Number((localData.miniGame && localData.miniGame.wins) || 0)),
-      plays: Math.max(Number((serverData.miniGame && serverData.miniGame.plays) || 0), Number((localData.miniGame && localData.miniGame.plays) || 0)),
-      inBattle: false,
-      playerHp: Math.max(Number((serverData.miniGame && serverData.miniGame.playerHp) || 100), Number((localData.miniGame && localData.miniGame.playerHp) || 100)),
-      enemyHp: 0,
-      enemyMaxHp: 0,
-      enemyPower: 0,
-      enemyName: '',
-      enemySprite: '',
-      log: (localData.miniGame && localData.miniGame.log) || (serverData.miniGame && serverData.miniGame.log) || 'No battle yet. Start one to enter the arena.',
-    },
+    miniGame: (function mergeMiniGame() {
+      const s = serverData.miniGame || {};
+      const l = localData.miniGame || {};
+      // Prefer whichever side has an active battle; fall back to most recent data
+      const active = l.inBattle ? l : (s.inBattle ? s : l);
+      return {
+        wins: Math.max(Number(s.wins || 0), Number(l.wins || 0)),
+        plays: Math.max(Number(s.plays || 0), Number(l.plays || 0)),
+        inBattle: !!(l.inBattle || s.inBattle),
+        playerHp: Number(active.playerHp || 100),
+        enemyHp: Number(active.enemyHp || 0),
+        enemyMaxHp: Number(active.enemyMaxHp || 0),
+        enemyPower: Number(active.enemyPower || 0),
+        enemyName: active.enemyName || '',
+        enemySprite: active.enemySprite || '',
+        log: active.log || l.log || s.log || 'No battle yet. Start one to enter the arena.',
+      };
+    })(),
   };
 
   for (const slot of EQUIPMENT_SLOTS) {
